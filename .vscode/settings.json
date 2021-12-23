@@ -1,0 +1,26 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "nuklear_glfw_gl3.h": "c",
+        "glfw3.h": "c",
+        "sokol_gfx.h": "c",
+        "nuklear.h": "c",
+        "nuklear_args.h": "c",
+        "nuklear_glfw_sokol.h": "c",
+        "nuklear_sokol.h": "c",
+        "glad.h": "c",
+        "sokol_args.h": "c",
+        "sokol_app.h": "c",
+        "initializer_list": "c",
+        "input_helper.h": "c",
+        "window.h": "c",
+        "os.h": "c",
+        "vx_utils.h": "c",
+        "vx_panic.h": "c",
+        "string.h": "c",
+        "stdio.h": "c",
+        "constants.h": "c",
+        "mb_data_structures.h": "c",
+        "mb_gui.h": "c"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "cmake build",
+            "command": "cmake",
+            "args": [
+                "--build",
+                ".",
+                "--config",
+                "debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}\\build"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Cmake build"
+        }
+    ],
+    "version": "2.0.0"
+}
