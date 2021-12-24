@@ -27,13 +27,13 @@ typedef struct {
 
     u32 swap_interval;
 
-    void(*backend_init_fn)(GLFWwindow*);
+    VX_CALLBACK(backend_init_fn, void, GLFWwindow*);
 
-    VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*) init;
-    VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*, vx_WindowInputHelper*) logic;
-    VX_CALLBACK(vx_UserStatePtr) draw;
-    VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*, u32, u32) resize;
-    VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*) close;
+    VX_CALLBACK(init, void, vx_UserStatePtr, vx_WindowControl*);
+    VX_CALLBACK(logic, void, vx_UserStatePtr, vx_WindowControl*, vx_WindowInputHelper*);
+    VX_CALLBACK(draw, void, vx_UserStatePtr);
+    VX_CALLBACK(resize, void, vx_UserStatePtr, vx_WindowControl*, u32, u32);
+    VX_CALLBACK(close, void, vx_UserStatePtr, vx_WindowControl*);
 } vx_WindowDescriptor;
 VX_CREATE_DEFAULT(vx_WindowDescriptor,
     .title      = "Window",

@@ -2,7 +2,7 @@
 
 #include "mb_hmm_helper.h"
 
-void mb_camera_controls_3dmode(mb_State* state, vx_WindowInputHelper* input) {
+void mb_camera_controls_3dmode(mb_Mode3DData* state, vx_WindowInputHelper* input) {
     if (input->keys[GLFW_KEY_W].pressed) {
         state->perspCameraData.position = HMM_AddVec3(state->perspCameraData.position, HMM_MultiplyVec3f(state->perspCameraData.front, state->perspCameraData.movementSpeed));
     } else if (input->keys[GLFW_KEY_S].pressed) {
@@ -49,19 +49,19 @@ void mb_camera_controls_3dmode(mb_State* state, vx_WindowInputHelper* input) {
     }
 }
 
-void mb_input_mode2d(mb_State* state, vx_WindowInputHelper* input) {
+void mb_input_mode2d(mb_GeneralData* general_data, vx_WindowInputHelper* input) {
     if (input->mouse.scrolled) {
-        state->mandelbrotInfoBlock.xScale += (f32)input->mouse.scroll_offset_y * state->mandelbrotInfoBlock.xScale / 10.0f;
-        state->mandelbrotInfoBlock.yScale += (f32)input->mouse.scroll_offset_y * state->mandelbrotInfoBlock.yScale / 10.0f;
+        general_data->mandelbrotInfoBlock.xScale += (f32)input->mouse.scroll_offset_y * general_data->mandelbrotInfoBlock.xScale / 10.0f;
+        general_data->mandelbrotInfoBlock.yScale += (f32)input->mouse.scroll_offset_y * general_data->mandelbrotInfoBlock.yScale / 10.0f;
     }
 
     if (input->mouse.mouse_buttons[GLFW_MOUSE_BUTTON_LEFT].pressed) {
-        state->mandelbrotInfoBlock.xPosition += (f32)input->mouse.offset_x / (f32)state->gfxData.screenWidth   / state->mandelbrotInfoBlock.xScale;
-        state->mandelbrotInfoBlock.yPosition += (f32)input->mouse.offset_y / -(f32)state->gfxData.screenHeight / state->mandelbrotInfoBlock.yScale;
+        general_data->mandelbrotInfoBlock.xPosition += (f32)input->mouse.offset_x / (f32)general_data->gfxData.screenWidth   / general_data->mandelbrotInfoBlock.xScale;
+        general_data->mandelbrotInfoBlock.yPosition += (f32)input->mouse.offset_y / -(f32)general_data->gfxData.screenHeight / general_data->mandelbrotInfoBlock.yScale;
     }
 }
 
-void mb_input_mode3d(mb_State* state, vx_WindowInputHelper* input, vx_WindowControl* window) {
+void mb_input_mode3d(mb_Mode3DData* state, vx_WindowInputHelper* input, vx_WindowControl* window) {
     if (input->mouse.mouse_buttons[GLFW_MOUSE_BUTTON_RIGHT].just_pressed || input->mouse.mouse_buttons[GLFW_MOUSE_BUTTON_RIGHT].just_released) {
         vx_windowcontrol_set_mouse_grab(window, !input->mouse.grabbed);
     }

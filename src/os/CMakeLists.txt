@@ -5,6 +5,7 @@ add_library(Os
     window.h window.c
     window_control.h window_control.c
     input_helper.h input_helper.c
+    state_manager.h state_manager.c
     nuklear/input_helper.h nuklear/input_helper.c
     context/opengl.h context/opengl.c
     context/sokol.h context/sokol.c

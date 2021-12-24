@@ -1,5 +1,5 @@
 {
-    "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.errorSquiggles": "Enabled",
     "files.associations": {
         "nuklear_glfw_gl3.h": "c",
         "glfw3.h": "c",
@@ -21,6 +21,10 @@
         "stdio.h": "c",
         "constants.h": "c",
         "mb_data_structures.h": "c",
-        "mb_gui.h": "c"
+        "mb_gui.h": "c",
+        "type_traits": "c",
+        "vx_template.h": "c",
+        "user_state_ptr.h": "c",
+        "state_manager.h": "c"
     }
 }

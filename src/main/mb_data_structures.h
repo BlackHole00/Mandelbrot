@@ -10,8 +10,8 @@
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
 
-#define MODE_2D_VIEW 0
-#define MODE_3D_VIEW 1
+#define MB_MODE_2D 0
+#define MB_MODE_3D 1
 
 typedef struct mb_UniformMandelbrotInfoBlock {
     float maxIterations;
@@ -26,12 +26,31 @@ typedef struct mb_UniformMandelbrotInfoBlock {
     } resolution;
     float maxValue;
 } mb_UniformMandelbrotInfoBlock;
+VX_CREATE_DEFAULT(mb_UniformMandelbrotInfoBlock, 
+    .maxIterations = 500,
+    .xPosition = 0.0f,
+    .yPosition = 0.0f,
+    .xScale = 1.0f,
+    .yScale = 1.0f,
+    .color = {
+        .r = 1.0f,
+        .g = 1.0f,
+        .b = 1.0f,
+        .a = 1.0f,
+    },
+    .maxValue = 2.0f
+)
 
 typedef struct mb_UniformTransformBlock {
     hmm_mat4 projection;
     hmm_mat4 view;
     hmm_mat4 model;
 } mb_UniformTransformBlock;
+VX_CREATE_DEFAULT(mb_UniformTransformBlock,
+    .projection = { 0 },
+    .model = { 0 },
+    .view = { 0 }
+)
 
 typedef struct mb_PerspCameraData {
     hmm_vec3 position;
@@ -41,6 +60,14 @@ typedef struct mb_PerspCameraData {
     bool fovChanged;
     float movementSpeed;
 } mb_PerspCameraData;
+VX_CREATE_DEFAULT(mb_PerspCameraData,
+    .position = { 0 },
+    .rotation = { -90, 0 },
+    .front = { 0 },
+    .fov = 90.0f,
+    .fovChanged = false,
+    .movementSpeed = 0.025f,
+)
 
 typedef struct mb_GfxData {
     float resolutionMultiplier;
@@ -59,48 +86,32 @@ typedef struct mb_GfxData {
         struct nk_colorf bgColor;
     } mode3d;
 } mb_GfxData;
+VX_CREATE_DEFAULT(mb_GfxData,
+    .screenWidth = WINDOW_WIDTH,
+    .screenHeight = WINDOW_HEIGHT,
+    .mode3d.bgColor = { 0.75f, 0.75f, 0.75f },
+    .resolutionMultiplier = 1.0f,
+)
 
-typedef struct State {
+typedef struct mb_GeneralData {
     mb_UniformMandelbrotInfoBlock mandelbrotInfoBlock;
     mb_UniformTransformBlock transformBlock;
-    mb_PerspCameraData perspCameraData;
     mb_GfxData gfxData;
-    int mode;
-    bool modeJustChanged;
-} mb_State;
-VX_CREATE_DEFAULT(mb_State,
-    .mandelbrotInfoBlock = {
-        .maxIterations = 500,
-        .xPosition = 0.0f,
-        .yPosition = 0.0f,
-        .xScale = 1.0f,
-        .yScale = 1.0f,
-        .color = {
-            .r = 1.0f,
-            .g = 1.0f,
-            .b = 1.0f,
-            .a = 1.0f,
-        },
-        .maxValue = 2.0f
-    },
-    .transformBlock = {
-        .projection = { 0 },
-        .model = { 0 },
-        .view = { 0 }
-    },
-    .perspCameraData = {
-        .position = { 0 },
-        .rotation = { -90, 0 },
-        .front = { 0 },
-        .fov = 90.0f,
-        .fovChanged = false,
-        .movementSpeed = 0.025f,
-    },
-    .gfxData = { 0 },
-    .mode = MODE_2D_VIEW,
-    .modeJustChanged = true,
-    .gfxData.screenWidth = WINDOW_WIDTH,
-    .gfxData.screenHeight = WINDOW_HEIGHT,
-    .gfxData.mode3d.bgColor = { 0.75f, 0.75f, 0.75f },
-    .gfxData.resolutionMultiplier = 1.0f,
+} mb_GeneralData;
+VX_CREATE_DEFAULT(mb_GeneralData,
+    .transformBlock = VX_DEFAULT(mb_UniformTransformBlock),
+    .mandelbrotInfoBlock = VX_DEFAULT(mb_UniformMandelbrotInfoBlock),
+    .gfxData = VX_DEFAULT(mb_GfxData)
+)
+
+typedef struct mb_Mode2DData {
+
+} mb_Mode2DData;
+VX_CREATE_DEFAULT(mb_Mode2DData)
+
+typedef struct mb_Mode3DData {
+    mb_PerspCameraData perspCameraData;
+} mb_Mode3DData;
+VX_CREATE_DEFAULT(mb_Mode3DData,
+    .perspCameraData = VX_DEFAULT(mb_PerspCameraData)
 )

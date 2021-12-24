@@ -10,11 +10,7 @@
 
 #include "key_state.h"
 #include "window_descriptor.h"
-
-/**
- * @brief A pointer to user defined data.
- */
-typedef void* vx_UserStatePtr;
+#include "user_state_ptr.h"
 
 /**
  * @brief The window structure. Hold all the data used by a window.
@@ -57,11 +53,11 @@ typedef struct {
     } info_data;
 
     struct {
-        VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*) init;
-        VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*, vx_WindowInputHelper*) logic;
-        VX_CALLBACK(vx_UserStatePtr) draw;
-        VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*, u32, u32) resize;
-        VX_CALLBACK(vx_UserStatePtr, vx_WindowControl*) close;
+        VX_CALLBACK(init, void, vx_UserStatePtr, vx_WindowControl*);
+        VX_CALLBACK(logic, void, vx_UserStatePtr, vx_WindowControl*, vx_WindowInputHelper*);
+        VX_CALLBACK(draw, void, vx_UserStatePtr);
+        VX_CALLBACK(resize, void, vx_UserStatePtr, vx_WindowControl*, u32, u32);
+        VX_CALLBACK(close, void, vx_UserStatePtr, vx_WindowControl*);
     } callback_functions;
 
     vx_UserStatePtr user_state;
