@@ -11,9 +11,18 @@
 
 void mb_mode2d_init(mb_GeneralData* general_data, mb_Mode2DData* state, vx_WindowControl* window) {
     vx_windowcontrol_set_mouse_grab(window, false);
-    general_data->transformBlock.projection = HMM_Orthographic(-1.0f, 1.0f, -1.0f, 1.0f, 0.001f, 100.0f);
-    general_data->transformBlock.view = HMM_LookAt(HMM_Vec3(0.0f, 0.0f, 6.0f), HMM_Vec3(0.0f, 0.0f, 0.0f), HMM_Vec3(0.0f, 1.0f, 0.0f));
-    general_data->transformBlock.model = HMM_Mat4d(1.0f);
+
+    state->camera = vx_camera_new(&(vx_CameraDescriptor){
+        .camera_type = VX_CAMERATYPE_ORTHOGRAPHIC,
+        .position = { 0, 0, 6 },
+        .rotation = { -90, 0 },
+        .left = -1.0f,
+        .right = 1.0f,
+        .top = 1.0,
+        .bottom = -1.0f,
+        .near = 0.001f,
+        .far = 100.0f
+    });
 }
 
 vx_StateUID mb_mode2d_logic(mb_GeneralData* general_data, mb_Mode2DData* state, vx_WindowControl* window, vx_WindowInputHelper* input) {
@@ -39,6 +48,8 @@ void mb_mode2d_draw(mb_GeneralData* general_data, mb_Mode2DData* state) {
     general_data->gfxData.passAction.colors[0].value = *((sg_color*)&general_data->gfxData.mode3d.bgColor);
     general_data->mandelbrotInfoBlock.resolution.screenWidth =  (float)general_data->gfxData.screenWidth * general_data->gfxData.resolutionMultiplier;
     general_data->mandelbrotInfoBlock.resolution.screenHeight = (float)general_data->gfxData.screenHeight * general_data->gfxData.resolutionMultiplier;
+
+    vx_camera_apply(&state->camera, &general_data->transformBlock.projection, &general_data->transformBlock.view, true);
 
     sg_begin_default_pass(&general_data->gfxData.passAction, general_data->gfxData.screenWidth, general_data->gfxData.screenHeight);
     sg_apply_pipeline(general_data->gfxData.pipelines);

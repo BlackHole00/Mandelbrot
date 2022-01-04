@@ -149,6 +149,13 @@ void mb_global_init(mb_GeneralData* general_data) {
 
     /* default pass action (clear to grey) */
     general_data->gfxData.passAction = (sg_pass_action){ 0 };
+
+    general_data->transformBlock.model = HMM_Mat4d(1.0f);
 }
 
-void mb_global_close(mb_GeneralData* general_data) {}
+void mb_global_close(mb_GeneralData* general_data) {
+    sg_destroy_buffer(general_data->gfxData.vertexBuffer);
+    sg_destroy_buffer(general_data->gfxData.indexBuffer);
+    sg_destroy_pipeline(general_data->gfxData.pipelines);
+    sg_destroy_shader(general_data->gfxData.shader);
+}

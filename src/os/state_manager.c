@@ -32,7 +32,7 @@ static void _vx_statemanager_draw(vx_StateManager* manager) {
 }
 
 static void _vx_statemanager_resize(vx_StateManager* manager, vx_WindowControl* window, u32 width, u32 height) {
-    manager->current_state->resize(manager->general_data, manager->current_state->userData, width, height);
+    manager->current_state->resize(manager->general_data, manager->current_state->userData, window, width, height);
 }
 
 static void _vx_statemanager_close(vx_StateManager* manager, vx_WindowControl* window) {

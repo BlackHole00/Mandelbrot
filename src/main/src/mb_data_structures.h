@@ -6,6 +6,7 @@
 #include <sokol_gfx.h>
 #include <nuklear_args.h>
 #include <nuklear.h>
+#include <gfx/camera.h>
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
@@ -52,23 +53,6 @@ VX_CREATE_DEFAULT(mb_UniformTransformBlock,
     .view = { 0 }
 )
 
-typedef struct mb_PerspCameraData {
-    hmm_vec3 position;
-    hmm_vec2 rotation;
-    hmm_vec3 front;
-    float fov;
-    bool fovChanged;
-    float movementSpeed;
-} mb_PerspCameraData;
-VX_CREATE_DEFAULT(mb_PerspCameraData,
-    .position = { 0 },
-    .rotation = { -90, 0 },
-    .front = { 0 },
-    .fov = 90.0f,
-    .fovChanged = false,
-    .movementSpeed = 0.025f,
-)
-
 typedef struct mb_GfxData {
     float resolutionMultiplier;
 
@@ -105,13 +89,14 @@ VX_CREATE_DEFAULT(mb_GeneralData,
 )
 
 typedef struct mb_Mode2DData {
-
+    vx_Camera camera;
 } mb_Mode2DData;
 VX_CREATE_DEFAULT(mb_Mode2DData)
 
 typedef struct mb_Mode3DData {
-    mb_PerspCameraData perspCameraData;
+    vx_Camera camera;
+    f32 movement_speed;
 } mb_Mode3DData;
 VX_CREATE_DEFAULT(mb_Mode3DData,
-    .perspCameraData = VX_DEFAULT(mb_PerspCameraData)
+    .movement_speed = 1.0f
 )

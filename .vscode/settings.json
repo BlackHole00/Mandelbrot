@@ -25,6 +25,9 @@
         "type_traits": "c",
         "vx_template.h": "c",
         "user_state_ptr.h": "c",
-        "state_manager.h": "c"
+        "state_manager.h": "c",
+        "vx_types.h": "c",
+        "mb_input.h": "c",
+        "vx_default.h": "c"
     }
 }

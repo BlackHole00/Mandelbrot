@@ -1,6 +1,6 @@
 #include "mb_gui.h"
 
-#include "mb_hmm_helper.h"
+#include <hmm_helper.h>
 
 void mb_control_ui_common(struct nk_context* ctx, mb_GeneralData* general_data) {
     nk_layout_row_dynamic(ctx, 10, 1);
@@ -133,16 +133,14 @@ vx_StateUID mb_control_ui_mode3d(struct nk_context* ctx, mb_GeneralData* general
         nk_layout_row_push(ctx, 0.25f);
         nk_label(ctx, "fov: ", NK_TEXT_LEFT);
         nk_layout_row_push(ctx, 1.0f);
-        if (nk_slider_float(ctx, 10.0f, &state->perspCameraData.fov, 120.0f, 1.0f)) {
-            state->perspCameraData.fovChanged = true;
-        }
+        if (nk_slider_float(ctx, 10.0f, &state->camera.fov, 120.0f, 1.0f));
         nk_layout_row_end(ctx);
 
         nk_layout_row_begin(ctx, NK_DYNAMIC, 30, 2);
         nk_layout_row_push(ctx, 0.25f);
         nk_label(ctx, "speed: ", NK_TEXT_LEFT);
         nk_layout_row_push(ctx, 1.0f);
-        nk_slider_float(ctx, 0.005f, &state->perspCameraData.movementSpeed, 0.075f, 0.0005f);
+        nk_slider_float(ctx, 0.5f, &state->movement_speed, 5.0f, 0.1f);
         nk_layout_row_end(ctx);
 
         nk_layout_row_dynamic(ctx, 10, 1);
@@ -151,14 +149,12 @@ vx_StateUID mb_control_ui_mode3d(struct nk_context* ctx, mb_GeneralData* general
         nk_layout_row_begin(ctx, NK_DYNAMIC, 40, 2);
         nk_layout_row_push(ctx, 0.5f);
         if (nk_button_label(ctx, "Move Inside")) {
-            state->perspCameraData.position = HMM_Vec3(0.0f, 0.0f, 0.0f);
+            vx_position_set(&state->camera.position, HMM_Vec3(0.0f, 0.0f, 0.0f));
         }
         if (nk_button_label(ctx, "Default")) {
-            state->perspCameraData.position = HMM_Vec3(0.0f, 0.0f, 6.0f);
-            state->perspCameraData.rotation = HMM_Vec2(-90.0f, 0.0f);
-            state->perspCameraData.front = HMM_Vec2Direction(state->perspCameraData.rotation);
-            state->perspCameraData.fov = (float)90.0;
-            state->perspCameraData.fovChanged = true;
+            vx_position_set(&state->camera.position, HMM_Vec3(0.0f, 0.0f, 6.0f));
+            vx_rotation_set(&state->camera.rotation, HMM_Vec3(-90.0f, 0.0f, 0.0f));
+            state->camera.fov = (float)90.0;
         }
         nk_layout_row_end(ctx);
 

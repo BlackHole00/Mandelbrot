@@ -5,19 +5,8 @@
 #include <malloc.h>
 #include <math.h>
 
-#include <glad/glad.h>
-#include <sokol_args.h>
-#include <sokol_gfx.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <nuklear_args.h>
-#include <nuklear.h>
-#include <nuklear_sokol.h>
-#include <nuklear_glfw_sokol.h>
-#include <HandmadeMath.h>
 #include <vx_utils.h>
 #include <os/os.h>
-#include <os/nuklear/input_helper.h>
 
 #include "mb_data_structures.h"
 #include "mb_global.h"
