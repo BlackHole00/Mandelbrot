@@ -2,7 +2,7 @@
 
 #include <hmm_helper.h>
 
-void mb_control_ui_common(struct nk_context* ctx, mb_GeneralData* general_data) {
+void mb_control_ui_common(struct nk_context* ctx, mb_GlobalData* general_data) {
     nk_layout_row_dynamic(ctx, 10, 1);
     nk_label(ctx, "position", NK_TEXT_LEFT);
 
@@ -100,7 +100,7 @@ vx_StateUID mb_control_ui_mode_selector(struct nk_context* ctx, vx_StateUID curr
     return returnState;
 }
 
-vx_StateUID mb_control_ui_mode2d(struct nk_context* ctx, mb_GeneralData* general_data, mb_Mode2DData* state) {
+vx_StateUID mb_control_ui_mode2d(struct nk_context* ctx, mb_GlobalData* general_data, mb_Mode2DData* state) {
     vx_StateUID returnState = MB_MODE_2D;
 
     if (nk_begin(ctx, "Zoom", nk_rect(50, 50, 250, 310),
@@ -115,7 +115,7 @@ vx_StateUID mb_control_ui_mode2d(struct nk_context* ctx, mb_GeneralData* general
     return returnState;
 }
 
-vx_StateUID mb_control_ui_mode3d(struct nk_context* ctx, mb_GeneralData* general_data, mb_Mode3DData* state) {
+vx_StateUID mb_control_ui_mode3d(struct nk_context* ctx, mb_GlobalData* general_data, mb_Mode3DData* state) {
     vx_StateUID returnState = MB_MODE_3D;
 
     if (nk_begin(ctx, "Zoom", nk_rect(50, 50, 250, 310),

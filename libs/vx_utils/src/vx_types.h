@@ -14,11 +14,6 @@ typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
 
-#ifdef _USE_FLOAT16
-#include <float16.h>
-typedef float16 f16;
-#endif
-
 typedef float f32;
 typedef double f64;
 
@@ -29,5 +24,3 @@ typedef ssize_t isize;
 #endif
 
 typedef char* rawstr;
-
-#define f16_from_i32(_INT) f16_from_int(_INT)

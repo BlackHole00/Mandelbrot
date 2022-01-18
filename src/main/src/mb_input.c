@@ -43,7 +43,7 @@ void mb_camera_controls_3dmode(mb_Mode3DData* state, vx_WindowInputHelper* input
     }
 }
 
-void mb_input_mode2d(mb_GeneralData* general_data, vx_WindowInputHelper* input) {
+void mb_input_mode2d(mb_GlobalData* general_data, vx_WindowInputHelper* input) {
     if (input->mouse.scrolled) {
         general_data->mandelbrotInfoBlock.xScale += (f32)input->mouse.scroll_offset_y * general_data->mandelbrotInfoBlock.xScale / 10.0f;
         general_data->mandelbrotInfoBlock.yScale += (f32)input->mouse.scroll_offset_y * general_data->mandelbrotInfoBlock.yScale / 10.0f;

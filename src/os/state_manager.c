@@ -3,43 +3,43 @@
 #include "input_helper.h"
 
 static void _vx_statemanager_init(vx_StateManager* manager, vx_WindowControl* window) {
-    manager->callbacks.first_init(manager->general_data);
+    manager->callbacks.first_init(manager->global_data);
 
     manager->current_state = VX_T(vx_State, vx_hashmap_get)(&manager->states, manager->current_state_UID);
     VX_ASSERT("Could not find state in state manager", manager->current_state != NULL);
 
-    manager->current_state->init(manager->general_data, manager->current_state->userData, window);
+    manager->current_state->init(manager->global_data, manager->current_state->userData, window);
 }
 
 static void _vx_statemanager_logic(vx_StateManager* manager, vx_WindowControl* window, vx_WindowInputHelper* input) {
-    vx_StateUID returned_UID = manager->current_state->logic(manager->general_data, manager->current_state->userData, window, input);
+    vx_StateUID returned_UID = manager->current_state->logic(manager->global_data, manager->current_state->userData, window, input);
 
     if (returned_UID != manager->current_state_UID) {
-        manager->current_state->close(manager->general_data, manager->current_state->userData, window);
+        manager->current_state->close(manager->global_data, manager->current_state->userData, window);
 
-        manager->callbacks.state_change(manager->general_data, manager->current_state->userData, returned_UID, manager->current_state_UID);
+        manager->callbacks.state_change(manager->global_data, manager->current_state->userData, returned_UID, manager->current_state_UID);
 
         manager->current_state_UID = returned_UID;
         manager->current_state = VX_T(vx_State, vx_hashmap_get)(&manager->states, manager->current_state_UID);
         VX_ASSERT("Could not find new state in state manager", manager->current_state != NULL);
 
-        manager->current_state->init(manager->general_data, manager->current_state->userData, window);
+        manager->current_state->init(manager->global_data, manager->current_state->userData, window);
     }
 }
 
 static void _vx_statemanager_draw(vx_StateManager* manager) {
-    manager->current_state->draw(manager->general_data, manager->current_state->userData);
+    manager->current_state->draw(manager->global_data, manager->current_state->userData);
 }
 
 static void _vx_statemanager_resize(vx_StateManager* manager, vx_WindowControl* window, u32 width, u32 height) {
-    manager->current_state->resize(manager->general_data, manager->current_state->userData, window, width, height);
+    manager->current_state->resize(manager->global_data, manager->current_state->userData, window, width, height);
 }
 
 static void _vx_statemanager_close(vx_StateManager* manager, vx_WindowControl* window) {
-    manager->callbacks.close(manager->general_data);
+    manager->callbacks.close(manager->global_data);
 }
 
-vx_State vx_state_from_statedescriptor(vx_StateDescriptor* descriptor) {
+vx_State vx_state_new(vx_StateDescriptor* descriptor) {
     vx_State state;
 
     state.userData = descriptor->user_data;
@@ -48,6 +48,8 @@ vx_State vx_state_from_statedescriptor(vx_StateDescriptor* descriptor) {
     state.draw = VX_SAFE_FUNC_PTR(descriptor->draw);
     state.resize = VX_SAFE_FUNC_PTR(descriptor->resize);
     state.close = VX_SAFE_FUNC_PTR(descriptor->close);
+
+    state.UID = descriptor->UID;
 
     VX_ASSERT("The logic function in a state cannot be NULL!", state.logic != NULL);
 
@@ -63,7 +65,7 @@ vx_StateManager vx_statemanager_new(vx_StateManagerDescriptor* descriptor) {
     manager.callbacks.state_change = VX_SAFE_FUNC_PTR(descriptor->state_change);
     manager.callbacks.close = VX_SAFE_FUNC_PTR(descriptor->close);
 
-    manager.general_data = descriptor->general_data;
+    manager.global_data = descriptor->global_data;
 
     return manager;
 }
@@ -84,9 +86,8 @@ void vx_statemanager_run(vx_StateManager* manager, vx_Window* window, vx_StateUI
     vx_window_run(window, manager);
 }
 
-void vx_statemanager_register_state(vx_StateManager* manager, vx_StateUID UID, vx_StateDescriptor* descriptor) {
-    vx_State state = vx_state_from_statedescriptor(descriptor);
-    state.UID = UID;
+void vx_statemanager_register_state(vx_StateManager* manager, vx_StateDescriptor* descriptor) {
+    vx_State state = vx_state_new(descriptor);
 
-    VX_T(vx_State, vx_hashmap_insert)(&manager->states, state, UID);
+    VX_T(vx_State, vx_hashmap_insert)(&manager->states, state, descriptor->UID);
 }

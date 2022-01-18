@@ -20,7 +20,7 @@ char* vx_file_get_content(FILE* file) {
     }
     VX_CHECK(file_len > 0, NULL)
 
-    /*  Allocated the needed space. */
+    /*  Allocate the needed space. */
     res = vx_smalloc((file_len + 1) * sizeof(char));
     res[file_len] = '\0';
     rewind(file);

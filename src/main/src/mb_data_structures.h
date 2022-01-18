@@ -1,3 +1,9 @@
+/**
+ * @file mb_data_structures.h
+ * @brief This file holds all the data structures used in this project.
+ * @author Vicix
+ * @date 07/01/2022
+ */
 #pragma once
 
 #include <vx_default.h>
@@ -11,9 +17,19 @@
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
 
-#define MB_MODE_2D 0
-#define MB_MODE_3D 1
+/**
+ * Identifies the states. Used as a constant and as UID.
+ */
+typedef enum mb_ModeUID {
+    MB_MODE_2D = 0,
+    MB_MODE_3D = 1,
+    MB_MODE_COUNT,
+} mb_ModeUID;
 
+/**
+ * This struct contains the data that is uploaded to the GPU in
+ * order to draw the mandelbrot set.
+ */
 typedef struct mb_UniformMandelbrotInfoBlock {
     float maxIterations;
     float xPosition;
@@ -42,6 +58,10 @@ VX_CREATE_DEFAULT(mb_UniformMandelbrotInfoBlock,
     .maxValue = 2.0f
 )
 
+/**
+ * This struct contains the data that is uploaded to the GPU in
+ * order to apply the prospective or orthogonal view.
+ */
 typedef struct mb_UniformTransformBlock {
     hmm_mat4 projection;
     hmm_mat4 view;
@@ -53,6 +73,9 @@ VX_CREATE_DEFAULT(mb_UniformTransformBlock,
     .view = { 0 }
 )
 
+/**
+ * This struct contains various stuff used to draw the set.
+ */
 typedef struct mb_GfxData {
     float resolutionMultiplier;
 
@@ -77,23 +100,38 @@ VX_CREATE_DEFAULT(mb_GfxData,
     .resolutionMultiplier = 1.0f,
 )
 
-typedef struct mb_GeneralData {
+/**
+ * Global data. Always available in every state.
+ */
+typedef struct mb_GlobalData {
     mb_UniformMandelbrotInfoBlock mandelbrotInfoBlock;
     mb_UniformTransformBlock transformBlock;
     mb_GfxData gfxData;
-} mb_GeneralData;
-VX_CREATE_DEFAULT(mb_GeneralData,
+} mb_GlobalData;
+VX_CREATE_DEFAULT(mb_GlobalData,
     .transformBlock = VX_DEFAULT(mb_UniformTransformBlock),
     .mandelbrotInfoBlock = VX_DEFAULT(mb_UniformMandelbrotInfoBlock),
     .gfxData = VX_DEFAULT(mb_GfxData)
 )
 
+/**
+ * Mode 2d data. The data used in the mode 2d state.
+ */
 typedef struct mb_Mode2DData {
+    /**
+     * Camera used in orthographic (2D) mode.
+     */
     vx_Camera camera;
 } mb_Mode2DData;
 VX_CREATE_DEFAULT(mb_Mode2DData)
 
+/**
+ * Mode 3d data. The data used in the mode 3d state.
+ */
 typedef struct mb_Mode3DData {
+    /**
+     * Camera used in perspective (3D) mode.
+     */
     vx_Camera camera;
     f32 movement_speed;
 } mb_Mode3DData;

@@ -10,24 +10,70 @@
  * @brief A helper structure used to easily read a window's input.
  */
 typedef struct {
+    /**
+     * The time passed (in nanoseconds) from the last frame.
+     */
     f64 delta_time;
 
+    /**
+     * The mouse state
+     */
     struct {
+        /**
+         * Identifies whatever or not the mouse cursor is grabbed.
+         */
         bool grabbed;
+
+        /**
+         * Identifies whatever or not the mouse has been moved since the last frame.
+         */
         bool moved;
+
+        /**
+         * The mouse movement in the x axis from the last frame.
+         */
         f64 offset_x;
+
+        /**
+         * The mouse movement in the y axis from the last frame.
+         */
         f64 offset_y;
+
+        /**
+         * The cursor position in the x axis.
+         */
         f64 pos_x;
+
+        /**
+         * The cursor position in the y axis.
+         */
         f64 pos_y;
 
+        /**
+         * Identifies whatever or not the mouse scroll has been moved since the last frame.
+         */
         bool scrolled;
+
+        /**
+         * The scroll offset in the x axis from the last frame.
+         */
         f64 scroll_offset_x;
+
+        /**
+         * The scroll offset in the y axis from the last frame.
+         */
         f64 scroll_offset_y;
 
+        /**
+         * The mouse buttons. Use GLFW_MOUSE_BUTTON_XXX as an index.
+         */
         vx_KeyState* mouse_buttons;
     } mouse;
 
     /*  This is temporary. Should use a table...    */
+    /**
+     * The keys. Use GLFW_KEY_XXX as an index.
+     */
     vx_KeyState* keys;
 } vx_WindowInputHelper;
 

@@ -1,10 +1,3 @@
-//------------------------------------------------------------------------------
-//  triangle-glfw.c
-//  Vertex buffer, simple shader, pipeline state object.
-//------------------------------------------------------------------------------
-#include <malloc.h>
-#include <math.h>
-
 #include <vx_utils.h>
 #include <os/os.h>
 
@@ -14,6 +7,7 @@
 #include "mb_mode3D.h"
 
 int main() {
+    /* Create a descriptor for the window. */
     vx_WindowDescriptor descriptor = VX_DEFAULT(vx_WindowDescriptor);
     descriptor.title = "Mandelbrot";
     descriptor.resizable    = true;
@@ -22,19 +16,24 @@ int main() {
     descriptor.height       = WINDOW_HEIGHT;
     descriptor.swap_interval = 1;
 
+    /* Create a new window. */
     vx_Window window = vx_window_new(&descriptor);
 
-    mb_GeneralData data = VX_DEFAULT(mb_GeneralData);
+    /* Create the various states' data. */
+    mb_GlobalData data = VX_DEFAULT(mb_GlobalData);
     mb_Mode2DData mode_2d_data = VX_DEFAULT(mb_Mode2DData);
     mb_Mode3DData mode_3d_data = VX_DEFAULT(mb_Mode3DData);
 
+    /* Create a state manager. */
     vx_StateManager manager = vx_statemanager_new(&(vx_StateManagerDescriptor){
         .first_init = mb_global_init,
         .close = mb_global_close,
-        .general_data = &data,
+        .global_data = &data,
     });
 
-    vx_statemanager_register_state(&manager, 0, &(vx_StateDescriptor){
+    /* Register the 2d mode state. */
+    vx_statemanager_register_state(&manager, &(vx_StateDescriptor){
+        .UID = MB_MODE_2D,
         .init = mb_mode2d_init,
         .logic = mb_mode2d_logic,
         .draw = mb_mode2d_draw,
@@ -43,7 +42,9 @@ int main() {
         .user_data = &mode_2d_data,
     });
 
-    vx_statemanager_register_state(&manager, 1, &(vx_StateDescriptor){
+    /* Register the 3d mode state. */
+    vx_statemanager_register_state(&manager, &(vx_StateDescriptor){
+        .UID = MB_MODE_3D,
         .init = mb_mode3d_init,
         .logic = mb_mode3d_logic,
         .draw = mb_mode3d_draw,
@@ -52,8 +53,10 @@ int main() {
         .user_data = &mode_3d_data,
     });
 
-    vx_statemanager_run(&manager, &window, 0);
+    /* Run the application. */
+    vx_statemanager_run(&manager, &window, MB_MODE_2D);
 
+    /* Free the state manager. */
     vx_statemanager_free(&manager);
 
     return 0;

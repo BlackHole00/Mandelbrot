@@ -6,10 +6,11 @@
 #include <nuklear.h>
 #include <nuklear_sokol.h>
 
-void mb_global_init(mb_GeneralData* general_data) {
+void mb_global_init(mb_GlobalData* global_data) {
+    /* Nuklear (GUI) initialization. */
     snk_setup(&(snk_desc_t){ 0 });
 
-    /* a vertex buffer */
+    /* The CUBE vertex data. */
     const float vertices[] = {
         /* pos                   uvs */
         -1.0f, -1.0f,  1.0f,     -1.0f, -1.0f,
@@ -42,12 +43,14 @@ void mb_global_init(mb_GeneralData* general_data) {
          1.0f,  1.0f,  1.0f,      1.0f,  1.0f,
          1.0f,  1.0f, -1.0f,     -1.0f,  1.0f
     };
-    general_data->gfxData.vertexBuffer = sg_make_buffer(&(sg_buffer_desc){
+    /* Upload the buffer to the GPU. */
+    global_data->gfxData.vertexBuffer = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(vertices),
         .type = SG_BUFFERTYPE_VERTEXBUFFER,
         .usage = SG_USAGE_IMMUTABLE
     });
 
+    /* The CUBE index data. */
     uint16_t indices[] = {
         0,  1,  2,   0,  2,  3,
         6,  5,  4,   7,  6,  4,
@@ -56,17 +59,18 @@ void mb_global_init(mb_GeneralData* general_data) {
         16, 17, 18,  16, 18, 19,
         22, 21, 20,  23, 22, 20
     };
-    general_data->gfxData.indexBuffer = sg_make_buffer(&(sg_buffer_desc){
+    global_data->gfxData.indexBuffer = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(indices),
         .type = SG_BUFFERTYPE_INDEXBUFFER,
         .usage = SG_USAGE_IMMUTABLE
     });
 
+    /* Get the sources of the shaders. */
     char* vs_source = vx_filepath_get_content("res/shaders/mandelbrot.vs");
     char* fs_source = vx_filepath_get_content("res/shaders/mandelbrot.fs");
 
-    /* a shader */
-    general_data->gfxData.shader = sg_make_shader(&(sg_shader_desc){
+    /* Tell the GPU how to use the sources and how to read the GPU shared data (uniforms, not buffers). */
+    global_data->gfxData.shader = sg_make_shader(&(sg_shader_desc){
         .vs = {
             .source = vs_source,
             .uniform_blocks[0] = {
@@ -124,9 +128,9 @@ void mb_global_init(mb_GeneralData* general_data) {
     free(vs_source);
     free(fs_source);
 
-    /* a pipeline state object (default render states are fine for triangle) */
-    general_data->gfxData.pipelines = sg_make_pipeline(&(sg_pipeline_desc){
-        .shader = general_data->gfxData.shader,
+    /* a pipeline state object. Tell the GPU how to draw and how to interpret the buffers data. */
+    global_data->gfxData.pipelines = sg_make_pipeline(&(sg_pipeline_desc){
+        .shader = global_data->gfxData.shader,
         .index_type = SG_INDEXTYPE_UINT16,
         .layout = {
             .attrs = {
@@ -142,20 +146,21 @@ void mb_global_init(mb_GeneralData* general_data) {
     });
 
     /* resource bindings */
-    general_data->gfxData.bindings = (sg_bindings){
-        .vertex_buffers[0] = general_data->gfxData.vertexBuffer,
-        .index_buffer = general_data->gfxData.indexBuffer
+    global_data->gfxData.bindings = (sg_bindings){
+        .vertex_buffers[0] = global_data->gfxData.vertexBuffer,
+        .index_buffer = global_data->gfxData.indexBuffer
     };
 
-    /* default pass action (clear to grey) */
-    general_data->gfxData.passAction = (sg_pass_action){ 0 };
+    /* default pass action */
+    global_data->gfxData.passAction = (sg_pass_action){ 0 };
 
-    general_data->transformBlock.model = HMM_Mat4d(1.0f);
+    global_data->transformBlock.model = HMM_Mat4d(1.0f);
 }
 
-void mb_global_close(mb_GeneralData* general_data) {
-    sg_destroy_buffer(general_data->gfxData.vertexBuffer);
-    sg_destroy_buffer(general_data->gfxData.indexBuffer);
-    sg_destroy_pipeline(general_data->gfxData.pipelines);
-    sg_destroy_shader(general_data->gfxData.shader);
+void mb_global_close(mb_GlobalData* global_data) {
+    /* Free the resources used. */
+    sg_destroy_buffer(global_data->gfxData.vertexBuffer);
+    sg_destroy_buffer(global_data->gfxData.indexBuffer);
+    sg_destroy_pipeline(global_data->gfxData.pipelines);
+    sg_destroy_shader(global_data->gfxData.shader);
 }
