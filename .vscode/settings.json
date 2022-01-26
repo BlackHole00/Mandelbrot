@@ -31,5 +31,16 @@
         "vx_default.h": "c",
         "malloc.h": "c",
         "math.h": "c"
-    }
+    },
+    "cSpell.words": [
+        "chiamabile",
+        "complicatezza",
+        "deinizializzazione"
+    ],
+    "cSpell.ignoreWords": [
+        "modalita'debug",
+        "modalita'di",
+        "piu'corta",
+        "verra"
+    ]
 }
