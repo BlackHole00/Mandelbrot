@@ -16,8 +16,8 @@ typedef struct vx_WindowControl {
 } vx_WindowControl;
 
 /**
- * @brief The vx_WindowControl construtor.
- * @param window A ponter to a window. The window must live *more* than the window control object.
+ * @brief The vx_WindowControl constructor.
+ * @param window A pointer to a window. The window must live *more* than the window control object.
  * @return The just constructed object.
  */
 vx_WindowControl vx_windowcontrol_new(vx_Window* window);

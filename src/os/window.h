@@ -114,14 +114,14 @@ void vx_glfw_init();
 void vx_glfw_terminate();
 
 /**
- * @brief Ideomatic wrapper around glfwWindowHint.
+ * @brief Idiomatic wrapper around glfwWindowHint.
  * @param _HINT The window hint to set.
  * @param _VALUE The new value of the window hint.
  */
 #define vx_glfw_window_hint(_HINT, _VALUE) glfwWindowHint((_HINT), (_VALUE));
 
 /**
- * @brief The vx_Window construtor.
+ * @brief The vx_Window constructor.
  * @param descriptor The descriptor of the window.
  * @return The just created window object.
  */

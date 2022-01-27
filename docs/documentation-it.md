@@ -30,7 +30,7 @@ Un ovvio esempio è l'operator overloading. Si consideri questo codice scritto i
   std::cout << !f << std::endl;
 ```
 Ebbene, sapendo che la classe `NumeroNaturale` rappresenta un numero e che quest'ultima è inizializzata a `1`, quale dovrebbe essere il risultato di `!f`? Secondo pura logica si dedurrebbe che `!1` = `0`. Questa assunzione è errata. L'operatore `!` in questo codice ritorna il fattoriale del numero. Questo comportamento è impossibile da determinare senza precedente conoscenza del programma. C'è una chiara mancanza di leggibilità.  
-Questo non è il solo problema: non è chiaro se sia in primo luogo chiamata un funzione che possa modificare i valori nel codice.
+Questo non è il solo problema: non è chiaro se sia in primo luogo chiamata un funzione che possa modificare i valori nel codice.  
 Secondo la mia filosofia il linguaggio di programmazione perfetto avrebbe bisogno delle seguenti caratteristiche:
 - <b>semplicità</b>. L'intero linguaggio deve poter essere imparabile da un comune mortale;
 - <b>chiarezza nella chiamata delle funzioni</b>: se un codice non sembra che debba chiamare una procedura non deve chiamarla;
@@ -221,4 +221,6 @@ Eventualmente tutti questi sistemi verranno implementati.
 La libreria è divisa correntemente in tre parti:
 - `OS` module: gestisce le finestre e gli input.
 - `GFX` module: contiene le cose dedicate al rendering (al momento contiene solo la `camera`).
-- `LOGIC` module: contiene strutture utili per generare la logica dell'applicazione (al momento è ancora piccolo).
+- `LOGIC` module: contiene strutture utili per generare la logica dell'applicazione (al momento è ancora piccolo ed in ideazione).
+Verranno spiegati tutti i moduli, ma per una visione collettiva del lavoro è consigliabile tenere in mente il seguente schema pseudo-UML (l'immagine è disponibile a [questo link]()):
+![schema UML framework](imgs/framework_uml.png)

@@ -78,8 +78,8 @@ typedef struct {
 } vx_WindowInputHelper;
 
 /**
- * @brief [INTERNAL] The vx_WindowInputHelper construtor.
- * @param window A ponter to a window. The window must live *more* than the window control object.
+ * @brief [INTERNAL] The vx_WindowInputHelper constructor.
+ * @param window A pointer to a window. The window must live *more* than the window control object.
  * @return The just constructed object.
  */
 vx_WindowInputHelper vx_windowinputhelper_new(vx_Window* window);
@@ -87,7 +87,7 @@ vx_WindowInputHelper vx_windowinputhelper_new(vx_Window* window);
 /**
  * @brief [INTERNAL] Used to update an helper already created. Can be used as long as the bound window remains the *same*.
  * @param helper The helper object.
- * @param window A ponter to the the window. The window must live *more* than the window control object and 
+ * @param window A pointer to the the window. The window must live *more* than the window control object and 
  *  must remain the *same* as the one used in the constructor.
  * @param delta_time The time passed from the last frame.
  */

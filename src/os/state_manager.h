@@ -129,7 +129,7 @@ typedef struct vx_StateManager {
         VX_CALLBACK(first_init, void, vx_UserStatePtr global_data);
 
         /**
-         * Called at state change, before the initilization of the new state.
+         * Called at state change, before the initialization of the new state.
          */
         VX_CALLBACK(state_change, void, vx_UserStatePtr global_data, vx_UserStatePtr prev_state_data, vx_StateUID new_state_UID, vx_StateUID old_state_UID);
 
@@ -141,14 +141,14 @@ typedef struct vx_StateManager {
 } vx_StateManager;
 
 /**
- * @brief [INTERNAL] The vx_State construtor.
+ * @brief [INTERNAL] The vx_State constructor.
  * @param descriptor The descriptor of the state.
  * @return The just created state object.
  */
 vx_State vx_state_new(vx_StateDescriptor* descriptor);
 
 /**
- * @brief The vx_StateManager construtor.
+ * @brief The vx_StateManager constructor.
  * @param descriptor The descriptor of the state manager.
  * @return The just created state manager object.
  */
