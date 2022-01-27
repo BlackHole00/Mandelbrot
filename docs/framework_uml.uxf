@@ -149,7 +149,7 @@ An optional struct that helps to calculate perspective and orthographic views.</
 *_LOGIC MODULE_*
 --
 /This module is work in progress. Look at the documentation for more Info./</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>610</x><y>1195</y><w>80</w><h>30</h></coordinates><panel_attributes>lt=&lt;.&gt;</panel_attributes><additional_attributes>60;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>170</x><y>170</y><w>990</w><h>860</h></coordinates><panel_attributes>lt=.
-*_GFX MODULE_*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>180</x><y>0</y><w>960</w><h>140</h></coordinates><panel_attributes>lt=.
+*_OS MODULE_*</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>180</x><y>0</y><w>960</w><h>140</h></coordinates><panel_attributes>lt=.
 *_LIBRARIES_*
 </panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>90</x><y>170</y><w>70</w><h>1070</h></coordinates><panel_attributes>lt=.
 

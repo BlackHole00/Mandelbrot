@@ -126,6 +126,30 @@ La libreria porta le seguenti features:
 >       VX_DBG_PANIC("Questo messaggio verra' mostrato solo in modalita'debug!");
 >   }
 > ```
+- creazione di valori di default specifichi per un tipo:
+> ``` c
+>   /* Definizione di una struttura d'esempio. */
+>   typedef struct Struct {
+>       i32 foo;
+>       f32 bar;
+>       char* baz;
+>   } Struct;
+>
+>   /* Creazione del default. */
+>   VX_CREATE_DEFAULT(Struct,
+>       .foo = 123,
+>       /* Nested defaults supported. */
+>       .bar = VX_DEFAULT(f32),
+>       .baz = NULL
+>   )
+>
+>   i32 main() {
+>       VX_ASSERT("VX_DEFAULT(u32) must be 0!", VX_DEFAULT(u32) == 0.0f);
+>
+>       Struct s = VX_DEFAULT(Struct);
+>       VX_ASSERT("foo must be 123 and baz must be NULL!", s.foo == 123 && s.baz == NULL);
+>   }
+> ```
 - macro per la <i>facile</i> creazione di funzioni e strutture dati che necessitano di un template. Questo viene ottenuto utilizzando l'operatore di concatenazione `##`. Alcuni esempi sono:
 > ``` c
 >   /* Creazione di una struttura generica. Il nome della struttura generata sara' `Struct_T` dove T e'il nome del tipo. Per esempio con u32: `Struct_u32`. */
@@ -214,6 +238,7 @@ Per vantaggi legati al debug del codice ed alla velocità di compilazione, Sokol
 Nuklear è una libreria che fornisce una <i>immediate-mode GUI</i>. Quest'ultima è in grado, una volta forniti in input i dati necessari di generare informazioni (<i>buffer</i>) leggibili dalla scheda grafica che possono essere, con la giusta implementazione, renderizzate indipendentemente dalle librerie utilizzate.  
 Si nota tuttavia che non è presente nessuna implementazione recente che usa Sokol e GLFW, quindi è stato necessario scriverne una per questa configurazione. Quest'ultima è stata poi modificata per utilizzare i migliori metodi di input del framework.
 
+---
 # Il Framework (dovrei probabilmente trovare un nome migliore)
 Il framework è una libreria costruita al di sopra delle precedenti menzionate dipendenze. Il suo compito è quello di creare un modo per aprire facilmente una finestra e creare un game-loop, con la minore frizione possibile.  
 Al momento della scrittura quest'ultimo tuttavia non offre ancora sistemi avanzati per la gestione della logica dell'applicazione (non possiede nessun <i>Entity Component System</i> o un <i>Resource Manager</i>) ed, oltre alla camera, non offre nessuna struttura di supporto per il rendering (quindi non esiste un <i>Renderer</i>).  
@@ -222,5 +247,324 @@ La libreria è divisa correntemente in tre parti:
 - `OS` module: gestisce le finestre e gli input.
 - `GFX` module: contiene le cose dedicate al rendering (al momento contiene solo la `camera`).
 - `LOGIC` module: contiene strutture utili per generare la logica dell'applicazione (al momento è ancora piccolo ed in ideazione).
-Verranno spiegati tutti i moduli, ma per una visione collettiva del lavoro è consigliabile tenere in mente il seguente schema pseudo-UML (l'immagine è disponibile a [questo link]()):
+
+Verranno spiegati tutti i moduli, ma per una visione collettiva del lavoro è consigliabile tenere in mente il seguente schema pseudo-UML (l'immagine è disponibile a [questo link](https://github.com/BlackHole00/Mandelbrot/blob/master/docs/imgs/framework_uml.png)):
+
 ![schema UML framework](imgs/framework_uml.png)
+
+# OS MODULE
+Come detto prima questo modulo si occupa di creare una finestra, di ottenere gli input e di creare un game loop. E'anche disponibile uno State Manager per facile gestione di applicazioni complesse.  
+Quest'ultimo si interfaccia con GLFW per ottenere questi obiettivi. Si nota però che si interfaccia anche con Sokol e Nuklear per alcune piccole cose.  
+Il modulo OS è diviso in ulteriori due parti:
+- First Layer
+- Second Layer
+
+## First Layer
+Questo strato è il primo. Provvede astrazioni per interfacciarsi con GLFW, Sokol e Nuklear. Provvede strutture quindi per gestire una finestra, per gestire l'input e per gestire un game loop.  
+In questo layer tale game loop viene creato attraverso l'uso di puntatori a funzione salvati in `vx_Window`, che vengono chiamati agli opportuni momenti, con i giusti parametri. L'utente può anche definire un puntatore ai propri dati, evitando di utilizzare variabili globali.  
+Queste sono le funzioni di callback che un'applicazione può implementare:
+- `void init(vx_UserStatePtr data_ptr, vx_WindowControl* window_control)`: chiamata all'inizializzazione dei dati. Prima dell'esecuzione del game loop.
+- `void logic(vx_UserStatePtr data_ptr, vx_WindowControl* window_control, vx_WindowInputHelper* input_helper)`: chiamata ogni frame per gestire la logica del gioco. Non dovrebbe essere utilizzata per disegnare nulla.
+- `void draw(vx_UserStatePtr data_ptr)`: chiamata ogni frame. Utilizzata esclusivamente per disegnare. Il motivo della divisione da `logic` è per la chiarezza. E' molto più facile seguire il codice se la logica è divisa dal disegno. Se, tuttavia, il programmatore lo desidera può comunque inserire codice di rendering in `logic` senza nessun problema.
+- `void resize(vx_UserStatePtr data_ptr, vx_WindowControl* window_control, u32 width, u32 height)`: chiamata quando la finestra viene ridimensionata.
+- `void close(vx_UserStatePtr data_ptr)`: chiamata quando viene richiesta la chiusura di una applicazione.
+
+### vx_Window
+Questa struttura è la più importante di tutto il layer. Si occupa di interfacciarsi con GLFW per creare una finestra ed utilizzare puntatori a funzioni per la logica dell'utente.  
+Per utilizzare questa finestra sono necessari due passaggi: Una prima inizializzazione della struttura, utilizzando `vx_window_new()` insieme ad un descrittore chiamato `vx_WindowDescriptor`. Quest'ultimo contiene la configurazione desiderata della finestra (per esempio titolo, grandezza, fullscreen...), un puntatore a funzione per inizializzare il context ed i callback mostrati nel paragrafo precedente.  
+Successivamente è necessario dire alla finestra di cominciare l'esecuzione, chiamando `vx_window_run`, la quale utilizza i vari callback.  
+
+Il funzionamento della prima fase è il seguente:
+- <b>inizializzare GLFW</b> se non è già stata inizializzata
+- <b>creare una finestra</b> utilizzando gli attributi desiderati
+- <b>inizializzare il context</b>: inizializza il context grafico utilizzando il puntatore a funzione. Di default viene inizializzato Sokol ed OpenGl, utilizzando Glad. Si veda la sezione di quest'ultima per informazioni più dettagliate. Si nota che l'utente è libero di creare una propria funzione per questo lavoro, quindi l'eventuale uso di librerie simili di terze parti è consentito e supportato.
+
+Nella seconda fase invece sono eseguiti i seguenti passi:
+- <b>inizializzazione dei dati dell'utente</b> (chiamata alla funzione `init`)
+- <b>per ogni frame</b>, finché non viene richiesta l'uscita:
+> - <b>calcolo dei frame al secondo</b> e visualizzazione sulla barra del titolo se richiesto
+> - <b>aggiornamento degli input</b> (aggiornando `vx_InputHelper`)
+> - <b>chiamata delle funzioni `logic` e `draw`</b> per l'esecuzione dell'applicazione
+- <b>chiamata della funzione `close`</b>
+- <b>distruzione della finestra</b> e deinizializzazione di GLFW.
+
+### vx_WindowInputHelper
+`vx_WindowInputHelper` è una struttura che permette all'utente di facilmente ottenere informazioni sull'input.  
+Si nota che questa struttura non legge gli input automaticamente, quindi viene automaticamente aggiornato dalla finestra ogni frame prima della chiamata della funzione `logic`.
+
+Gli input da parte dell'utente possono essere ottenuti accedendo ai seguenti fields:
+- `delta_time`: il tempo passato dall'ultimo frame
+- `mouse`: tutte le informazioni legate ai dati del mouse. In particolare `position_x`, `position_y` e `mouse_buttons`.
+- `keys`: lo stato dei pulsanti della tastiera.
+
+Si nota tuttavia che `keys` e `mouse.mouse_buttons` sono vettori di `vx_KeyState`. Per accedere alle informazioni di una determinato pulsante è necessario utilizzare i codici di GLFW come indici.
+
+Per esempio porre questo codice nella funzione `logic` farebbe scrivere nella console `"Ciao"` ad ogni frame se si preme la space bar:
+> ``` c
+> if (input_helper->keys[GLFW_KEY_SPACE].pressed) {
+>   printf("Ciao\n");
+> }
+> ```
+
+La funzione `vx_inputhelper_update_nuklear_input()` utilizza l'input helper per inviare gli input a Nuklear.
+
+### vx_WindowControl
+Questa struttura permette di controllare una `vx_Window` senza interfacciarsi direttamente su di essa.  
+Questo permette di diminuire il numero di bug nel caso di operazioni che la libreria non si aspetta. L'utente può comunque accedere alla finestra `vx_Window` ed addirittura a quella GLFW se lo desidera.  
+Si nota che se l'utente ha tuttavia bisogno di fare queste operazioni la libreria dovrebbe essere modificata in modo da, sempre nel rispetto della semplicità, offrire un metodo utilizzando `vx_WindowControl`.  
+Alcune interessanti funzioni sono:
+- `vx_windowcontrol_exit()`: richiede la chiusura dell'applicazione
+- `vx_windowcontrol_set_mouse_grab()`: richiede alla finestra di "grabbare" in mouse
+
+### Esempio di un'applicazione minimale
+Questa semplice applicazione (che non disegna nulla sullo schermo), è un esempio per meglio comprendere il funzionamento del primo layer della libreria.  
+Quest'ultimo stamperà sulla console un numero che può essere incrementato premendo `SPACE` e decrementato premendo `SHIFT`. E'possibile chiudere l'applicazione premendo `ESCAPE`.
+
+> ``` c
+>   #include <stdio.h>
+>   #include <os/os.h>
+>
+>   /* GameState: struttura che mantiene i dati dell'applicazione. */
+>   typedef struct GameState {
+>       i32 number;
+>   } GameState;
+>
+>   /* Chiamata all'inizializzazione. */
+>   void init(GameState* game_state, vx_WindowControl* window) {
+>       game_state->number = 0;
+>   }
+>
+>   /* Chiamata ad ogni frame. */
+>   void logic(GameState* game_state, vx_WindowControl* window, vx_WindowInputHelper* input) {
+>       if (input->keys[GLFW_KEY_SPACE].just_pressed) {
+>           game_state->number++;
+>       } else if (input->keys[GLFW_KEY_LEFT_SHIFT].just_pressed) {
+>           game_state->number--;
+>       }
+>
+>       if (input->keys[GLFW_KEY_ESCAPE].just_pressed) {
+>           vx_windowcontrol_exit(window);
+>       }
+>   }
+>
+>   /* Chiamata ad ogni frame. */
+>   void draw(GameState* game_state) {
+>       printf("Number: %d\n", game_state->number);
+>   }
+>
+>   /* Chiamata alla chiusura dell'applicazione. */
+>   void close(GameState* game_state) {
+>       printf("Closing!!! The number was: %d\n", game_state->number);
+>   }
+>
+>   i32 main() {
+>     /* Creazione di un descrittore per creare la finestra. */
+>     vx_WindowDescriptor desc = VX_DEFAULT(vx_WindowDescriptor);
+>     desc.title = "Counter";
+>     desc.init = init;
+>     desc.logic = logic;
+>     desc.draw = draw;
+>     desc.close = close;
+>     /* Funzione di resize omessa. Il programma non crashera'. */
+>
+>     /* Inizializzazione della finestra. */
+>     vx_Window window = vx_window_new(&desc);
+>
+>     /* Potrebbe essere una buona idea allocare i game state sull'heap. */
+>     GameState* game_state = vx_smalloc(sizeof(GameState));
+>
+>     /* Esecuzione applicazione. */
+>     vx_window_run(&window, (vx_UserStatePtr)game_state);
+>
+>     free(game_state);
+>
+>     return 0;
+>   }
+> ```
+
+## Second Layer
+Sebbene la soluzione offerta dal primo layer possa sembrare molto modulare, essa è in realtà adatta solo a piccoli progetti.  
+Quando si vuole avere grandi applicazioni l'astrazione presente non è più sufficiente.  
+
+Il secondo layer offre un'ulteriore livello di astrazione totalmente opzionale che si basa sull'utilizzo di una finestra già creata.  
+E'stata quindi inserita una nuova struttura chiamata `vx_StateManager`, che è appunto un gestore di stati dell'applicazione.  
+Si pensi ad uno stato come un particolare momento dell'applicazione. Si prenda per esempio un videogioco: quest'ultimo è formato da molte parti diverse, come un Menù e la scena di gioco. Ecco non c'è nessun motivo per il menù di contenere tutto il codice ed i dati necessari al gioco e, viceversa, il gioco non ha bisogno delle informazioni del menu.
+
+Uno stato è quindi un vero e proprio stato dell'applicazione che è distinto dagli altri stati dell'applicazione, ma ne può comunque comunicare. Ad ogni stato sono quindi associate tali informazioni:
+- un UID: un identificatore universale. Può essere una costante o un'hash di una stringa.
+- un puntatore alla memoria utilizzata per i dati
+- varie funzioni di callback simili a quelle di `vx_Window`:
+> - `void init(vx_UserStatePtr global_data_ptr, vx_UserStatePtr data_ptr, vx_WindowControl* window_control)`
+> - `vx_StateUID logic(vx_UserStatePtr global_data_ptr, vx_UserStatePtr data_ptr, vx_WindowControl* window_control, vx_WindowInputHelper* input_helper)`: ritorna l'UID dello stato che deve essere eseguito il prossimo frame.
+> - `void draw(vx_UserStatePtr global_data_ptr, vx_UserStatePtr data_ptr)`
+> - `void resize(vx_UserStatePtr global_data_ptr, vx_UserStatePtr data_ptr, vx_WindowControl* window_control, u32 width, u32 height)`
+> - `void close(vx_UserStatePtr global_data_ptr, vx_UserStatePtr data_ptr)`
+
+Con l'implementazione attuale non è tuttavia possibile eseguire molteplici stati contemporaneamente. Supporto per tale feature è previsto, una volta che la libreria verrà resa multithread-safe.
+
+Si può pensare che tale implementazione sia completa, ma manca ancora un metodo per scambiare i dati attraverso gli stati. La libreria offre quindi la possibilità di definire uno stato globale, che può essere accesso sempre.  
+Sono anche offerte le seguenti funzioni aggiuntive:
+- `void first_init(vx_UserStatePtr global_data)`: utilizzata per inizializzare lo stato globale.
+- `void state_change(vx_UserStatePtr global_data, vx_UserStatePtr prev_state_data, vx_StateUID new_state_UID, vx_StateUID old_state_UID)`: chiamata in un cambio di stato.
+- `void last_close(vx_UserStatePtr global_data)`: chiamata alla chiusura del programma.
+
+Si fa notare infine che la transizione da un'implementazione First-Layer a una Second-Layer è molto semplice: tutto il resto della libreria è utilizzabile senza cambiamenti e le funzioni della logica possono essere riutilizzate senza maggiori riscritture.
+
+### vx_StateManager
+Come detto nel paragrafo precedente, `vx_StateManager` è una struttura che si occupa di gestire i vari stati (internamenti chiamati `vx_State`).  
+Quest'ultima utilizza un'hash map per salvarli in memoria ed utilizza una finestra `vx_Window` come base, infatti ne sovrascrive i callback per utilizzare i propri. Si enfatizza che l'utente non ha bisogno di questi ultimi se utilizza una soluzione Second-Layer: quest'ultimo può utilizzare gli stati.
+
+Come `vx_Window`, `vx_StateManager` può essere configurato utilizzando il descrittore `vx_StateManagerDescriptor`, che contiene un puntatore ai dati globali e alle funzioni `first_init`, `state_change`, `last_close`.
+
+Sarà possibile poi inserire stati utilizzando `vx_statemanager_register_state()`, insieme ad al descrittore `vx_StateDescriptor`, il quale contiene, similarmente a `vx_StateManagerDescriptor`, un puntatore ai dati dello stato ed alle funzioni `init`, `logic`, `draw`, `resize` e `close`, ma anche il proprio UID.
+
+E'possibile successivamente chiamare `vx_statemanager_run()` per eseguire l'applicazione. Una volta fornita una finestra e l'UID del primo stato, la chiamata di questa funzione causerà i seguenti passi:
+- <b>sovrascrittura dei callback</b> della finestra passata come parametro
+- <b>esecuzione della finestra</b> (stile First-Layer). I nuovi callback eseguiranno rispettivamente le seguenti istruzioni:
+> - `init`: chiamerà `first_init` (per inizializzare i dati globali) e la funzione `init` del primo stato.
+> - `logic`: chiamerà la funzione `logic` dello stato attuale ad ogni frame. Eventualmente ad un cambio di stato chiamerà `close` (sul vecchio stato), `state_change` e `init` (per il nuovo stato).
+> - `draw`: chiamerà `draw` dello stato attuale.
+> - `resize`: chiamerà `resize` dello stato attuale.
+> - `close`: chiamerà `close` dello stato attuale e `last_close` per pulire lo stato globale.
+
+Diversamente da `vx_Window`, `vx_StateManager` alloca memoria sull'heap (per l'hash map), quindi prima della terminazione del programma è necessario chiamare `vx_hashmap_free()` per liberare la memoria allocata.
+
+### Esempio di un'applicazione utilizzante gli stati
+In questa sezione verrà riscritto l'esempio per il First-Layer utilizzando gli stati. Si fa notare che questo programma è solo a scopo dimostrativo: è molto più semplice nella sua iterazione precedente
+
+Verranno utilizzati due stati: uno che incrementa il contatore ogni frame ed uno che lo diminuisce ogni frame. Sarà anche salvato il numero di volte che ogni stato viene utilizzato, per porre un esempio per le informazioni per-stato. E'possibile cambiare stato utilizzando la space bar.
+
+> ```c
+>   #include <stdio.h>
+>   #include <os/os.h>
+>
+>   /* UIDs */
+>   const vx_StateUID INC_MODE_UID = 0;
+>   const vx_StateUID DEC_MODE_UID = 1;
+>
+>   /* Dichiarazione stati: GlobalState sarà sempre disponibile, */
+>   /* IncModeState e DecModeState servono per gli stati. */
+>   typedef struct GlobalState {
+>       i32 number;
+>   } GlobalState;
+>
+>   typedef struct IncModeState {
+>       u32 increments;
+>   } IncModeState;
+>
+>   typedef struct DecModeState {
+>       u32 decrements;
+>   } DecModeState;
+>
+>   /* Funzioni stato-indipendenti */
+>   void first_init(GlobalState* global_state) {
+>       global_state->number = 0;
+>   }
+>
+>   void last_close(GlobalState* global_state) {
+>       printf("The number is %d!!!\n", global_state->number);
+>   }
+>
+>   /* Funzioni per lo stato di incremento. */
+>   void incmodestate_init(GlobalState* global_state, IncModeState* state, vx_WindowControl* window) {
+>       printf("Entering Increment state.\n");
+>       state->increments = 0;
+>   }
+>
+>   vx_StateUID incmodestate_logic(GlobalState* global_state, IncModeState* state, vx_WindowControl* window, vx_WindowInputHelper* input) {
+>       if (input->keys[GLFW_KEY_ESCAPE].just_pressed) {
+>          vx_windowcontrol_exit(window);
+>       }
+>       if (input->keys[GLFW_KEY_SPACE].just_pressed) {
+>           return DEC_MODE_UID;
+>       }
+>       return INC_MODE_UID;
+>   }
+>
+>   void incmodestate_draw(GlobalState* global_state, IncModeState* state) {
+>       printf("Mode Increment: number = %d!\n", global_state->number);
+>       global_state->number++;
+>       state->increments++;
+>   }
+>
+>   void incmodestate_close(GlobalState* global_state, IncModeState* state, vx_WindowControl* window) {
+>       printf("Exiting Increment state. There has been %d increments!!!", state->increments);
+>   }
+>
+>   /* Funzioni per lo stato di decremento. */
+>   void decmodestate_init(GlobalState* global_state, DecModeState* state, vx_WindowControl* window) {
+>       printf("Entering Decrement state.\n");
+>       state->decrements = 0;
+>   }
+>
+>   vx_StateUID decmodestate_logic(GlobalState* global_state, DecModeState* state, vx_WindowControl* window, vx_WindowInputHelper* input) {
+>       if (input->keys[GLFW_KEY_ESCAPE].just_pressed) {
+>          vx_windowcontrol_exit(window);
+>       }
+>       if (input->keys[GLFW_KEY_SPACE].just_pressed) {
+>           return INC_MODE_UID;
+>       }
+>       return DEC_MODE_UID;
+>   }
+>
+>   void decmodestate_draw(GlobalState* global_state, DecModeState* state) {
+>       printf("Mode Decrement: number = %d!\n", global_state->number);
+>       global_state->number--;
+>       state->decrements++;
+>   }
+>
+>   void decmodestate_close(GlobalState* global_state, DecModeState* state, vx_WindowControl* window) {
+>       printf("Exiting Decrement state. There has been %d increments!!!", state->decrements);
+>   }
+>
+>   i32 main() {
+>       /* Creazione di un descrittore per creare la finestra. */
+>       vx_WindowDescriptor desc = VX_DEFAULT(vx_WindowDescriptor);
+>
+>       /* Inizializzazione della finestra. */
+>       vx_Window window = vx_window_new(&desc);
+>
+>       /* Potrebbe essere una buona idea allocare gli stati sull'heap. */
+>       GlobalState* global_state = vx_smalloc(sizeof(GlobalState));
+>       IncModeState* inc_mode_state = vx_smalloc(sizeof(IncModeState));
+>       DecModeState* dec_mode_state = vx_smalloc(sizeof(DecModeState));
+>
+>       /* Creazione di uno state manager. */
+>       vx_StateManager manager = vx_statemanager_new(&(vx_StateManagerDescriptor){
+>           .first_init = first_init,
+>           .close = last_close,
+>           .global_data = global_state,
+>       });
+>
+>       /* Registrazione stato di incremento. */
+>       vx_statemanager_register_state(&manager, &(vx_StateDescriptor){
+>           .UID = INC_MODE_UID,
+>           .init = incmodestate_init,
+>           .logic = incmodestate_logic,
+>           .draw = incmodestate_draw,
+>           .close = incmodestate_close,
+>           .user_data = inc_mode_state,
+>       });
+>
+>       /* Registrazione stato di decremento. */
+>       vx_statemanager_register_state(&manager, &(vx_StateDescriptor){
+>           .UID = DEC_MODE_UID,
+>           .init = decmodestate_init,
+>           .logic = decmodestate_logic,
+>           .draw = decmodestate_draw,
+>           .close = decmodestate_close,
+>           .user_data = dec_mode_state,
+>       });
+>
+>       /* Esecuzione dell'applicazione. */
+>       vx_statemanager_run(&manager, &window, INC_MODE_UID);
+>
+>       /* Liberazione memoria */
+>       vx_statemanager_free(&manager);
+>       free(global_state);
+>       free(inc_mode_state);
+>       free(dec_mode_state);
+>
+>       return 0;
+>   }
+> ```
