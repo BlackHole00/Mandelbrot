@@ -23,7 +23,7 @@ Si fa notare infine che il codice è <i>per la maggior parte</i> commentato (in 
 # Attraverso lo Specchio
 ## Filosofie e Linguaggi
 Prima di tutto è importante sapere che sono sempre stato interessato a linguaggi di programmazione a basso livello (quindi compilati), specificamente con allocazione manuale di memoria. E'sempre stato importante per me sapere esattamente come vengono convertite le informazioni e le funzioni dal codice al linguaggio macchina, dove e come vengono salvati i dati in memoria. Sebbene al giorno d'oggi la maggior parte di linguaggi sono interpretati o utilizzano metodi ottusi per gestire la memoria, ne rimangono sempre alcuni.  
-Molti utenti spesso pensano che più il linguaggio sia grande e complicato, più sia una migliore soluzione per i loro progetto, ma spesso capita di farsi trasportare dalle features <i>astratte</i> dei linguaggi di programmazione più complessi, aggiungendo al proprio codice dettagli e funzionamenti che portano solo più complicatezza ed illeggibilità, in cambio di una soluzione che può sembrare più <i>intelligente o astratta</i>.  
+Molti utenti spesso pensano che più il linguaggio sia grande e complicato, più sia una migliore soluzione per i loro progetto, ma spesso capita di farsi trasportare dalle features <i>astratte</i> dei linguaggi di programmazione più complessi, aggiungendo al proprio codice dettagli e funzionamenti che portano solo più complessità ed illeggibilità, in cambio di una soluzione che può sembrare più <i>intelligente o astratta</i>.  
 Un ovvio esempio è l'operator overloading. Si consideri questo codice scritto in cpp, preso da un progetto scolastico:
 ```cpp
   NumeroNaturale f(1);
@@ -32,7 +32,7 @@ Un ovvio esempio è l'operator overloading. Si consideri questo codice scritto i
 Ebbene, sapendo che la classe `NumeroNaturale` rappresenta un numero e che quest'ultima è inizializzata a `1`, quale dovrebbe essere il risultato di `!f`? Secondo pura logica si dedurrebbe che `!1` = `0`. Questa assunzione è errata. L'operatore `!` in questo codice ritorna il fattoriale del numero. Questo comportamento è impossibile da determinare senza precedente conoscenza del programma. C'è una chiara mancanza di leggibilità.  
 Questo non è il solo problema: non è chiaro se sia in primo luogo chiamata un funzione che possa modificare i valori nel codice.  
 Secondo la mia filosofia il linguaggio di programmazione perfetto avrebbe bisogno delle seguenti caratteristiche:
-- <b>semplicità</b>. L'intero linguaggio deve poter essere imparabile da un comune mortale;
+- <b>semplicità</b>. L'intero linguaggio deve poter essere apprendibile da un comune mortale in una tempistica accettabile;
 - <b>chiarezza nella chiamata delle funzioni</b>: se un codice non sembra che debba chiamare una procedura non deve chiamarla;
 - <b>chiarezza e consistenza nello stile</b>: un linguaggio dovrebbe essere bello da vedere e non ci si dovrebbe mai chiedere cosa un determinato simbolo o espressione faccia.
 - <b>un programma serve solo a trasformare dati in altri dati. Un dato non è altro che uno spazio in memoria.</b>
@@ -46,7 +46,7 @@ Sono stati considerati e scartati i seguenti linguaggi:
 - [`C3`](https://www.c3-lang.org/): evoluzione spirituale del linguaggio C. Prova ad espanderlo mantenendone la stessa filosofia. Tuttavia penso che si sia spinto troppo lontano dai concetti originari. Come Zig ed Odin è ancora immaturo.
 - [`Jai`](https://www.youtube.com/playlist?list=PLmV5I2fxaiCKfxMBrNsU1kgKJXD3PkyxO): il linguaggio che più si avvicina alle mie caratteristiche ideali. Utilizza una sintassi molto simile ad Odin e permette di eseguire grandi parti di codice al tempo della compilazione ([addirittura un intero gioco](https://youtu.be/UTqZNujQOlA?t=2639)). Tuttavia è ancora in sviluppo ed è in closed beta.
 
-Si ricorda infine che il linguaggio C ha vari compilatori, varianti e dialetti. Per questo progetto è stato utilizzato il compilatore `gcc`. Ed è stato scelto il dialetto `C99`, in quanto è abbastanza moderno e non ho motivo per utilizzare standard più moderni. L'unica feature utilizzata non conformante agli standard è l'uso dell'operatore `typeof`, che è utilizzato solo per migliore debugging e può essere disabilitato attraverso un `#define`.
+Si ricorda infine che il linguaggio C ha vari compilatori, varianti e dialetti. Per questo progetto è stato utilizzato il compilatore `gcc`. Ed è stato scelto il dialetto `C99`, in quanto è abbastanza moderno e non ho motivo per utilizzare standard più aggiornati. L'unica feature utilizzata non conformante agli standard è l'uso dell'operatore `typeof`, che è utilizzato solo per migliore debugging e può essere disabilitato attraverso un `#define`.
 
 ---
 # Dipendenze
@@ -72,19 +72,29 @@ La libreria porta le seguenti features:
 >   }
 >
 >   i32 main() {
->       /* func è un puntatore a funzione che ritorna un i32 e prende un f32 ed un i32. */
->       /* Internamente il tipo viene convertito in `int (*func)()`. */
+>       /* func è un puntatore a funzione che ritorna un i32 e prende
+>        * un f32 ed un i32. Internamente il tipo viene convertito in 
+>        * `int (*func)()`. 
+>        */
 >       VX_CALLBACK(func, i32, f32, i32) = add;
 >
->       /* Per maggiore chiarezza è anche possibile nominare i parametri del callback. */
+>       /* Per maggiore chiarezza è anche possibile nominare i parametri 
+>        * del callback. 
+>        */
 >       VX_CALLBACK(func2, i32, f32 a, i32 b) = add;
 >
->       /* Può capitare che un puntatore a funzione sia NULL, come nel seguente caso: */
+>       /* Può capitare che un puntatore a funzione sia NULL, come nel 
+>        * seguente caso: 
+>        */
 >       VX_CALLBACK(illegal_fn, void) = NULL;
->       /* La seguente funzione farebbe quindi crashare il programma se lasciata non commentata. */
+>       /* La seguente funzione farebbe quindi crashare il programma se 
+>        * lasciata non commentata. 
+>        */
 >       // illegal_fn();
 >
->       /* `VX_SAFE_FUNC_PTR` è in grado di convertire tale puntatore in uno che possa essere chiamato. */
+>       /* `VX_SAFE_FUNC_PTR` è in grado di convertire tale puntatore 
+>        * in uno che possa essere chiamato. 
+>        */
 >       illegal_fn = VX_SAFE_FUNC_PTR(illegal_fn);
 >       /* Ora `illegal_fn` è ora chiamabile. */
 >       illegal_fn();
@@ -97,16 +107,25 @@ La libreria porta le seguenti features:
 >   } Stuff;
 >
 >   i32 stuff_func(Stuff* stuff) {
->       /* In questa funzione stuff non può essere NULL: deve essere inizializzato. E'possibile utilizzare `VX_NULL_ASSERT` che crea un eventuale errore a run time se in modalita'di debug. */
+>       /* In questa funzione stuff non può essere NULL: deve essere
+>        * inizializzato. E'possibile utilizzare `VX_NULL_ASSERT` che
+>        * crea un eventuale errore a run time se in modalita'di debug.
+>        */
 >       VX_NULL_ASSERT(stuff);
->       /* Similarmente se si preferisce che il codice non si fermi è possibile utilizzare `VX_NULL_CHECK`, che ritornerà eventualmente un valore di default, non prima di aver inviato un messaggio di warning. */
+>       /* Similarmente se si preferisce che il codice non si fermi è
+>        * possibile utilizzare `VX_NULL_CHECK`, che ritornerà eventualmente
+>        * un valore di default, non prima di aver inviato un messaggio di
+>        * warning.
+>        */
 >       VX_NULL_CHECK(stuff, 0);
 >
 >       return stuff->a;
 >   }
 >
 >   void func() {
->       /* Questa funzione non è stata completata dal programmatore. Se chiamata quest'ultima farà cashare il programma. */
+>       /* Questa funzione non è stata completata dal programmatore. Se
+>        * chiamata quest'ultima farà cashare il programma.
+>        */
 >       VX_UNIMPLEMENTED(); 
 >   }
 >
@@ -123,7 +142,9 @@ La libreria porta le seguenti features:
 >           VX_PANIC("Non dovremmo essere qui!");
 >       }
 >
->       VX_DBG_PANIC("Questo messaggio verra' mostrato solo in modalita'debug!");
+>       VX_DBG_PANIC(
+>           "Questo messaggio verra' mostrato solo in modalita'debug!"
+>       );
 >   }
 > ```
 - creazione di valori di default specifichi per un tipo:
@@ -147,17 +168,26 @@ La libreria porta le seguenti features:
 >       VX_ASSERT("VX_DEFAULT(u32) must be 0!", VX_DEFAULT(u32) == 0.0f);
 >
 >       Struct s = VX_DEFAULT(Struct);
->       VX_ASSERT("foo must be 123 and baz must be NULL!", s.foo == 123 && s.baz == NULL);
+>       VX_ASSERT(
+>           "foo must be 123 and baz must be NULL!",
+>           s.foo == 123 && s.baz == NULL
+>       );
 >   }
 > ```
 - macro per la <i>facile</i> creazione di funzioni e strutture dati che necessitano di un template. Questo viene ottenuto utilizzando l'operatore di concatenazione `##`. Alcuni esempi sono:
 > ``` c
->   /* Creazione di una struttura generica. Il nome della struttura generata sara' `Struct_T` dove T e'il nome del tipo. Per esempio con u32: `Struct_u32`. */
+>   /* Creazione di una struttura generica. Il nome della struttura 
+>    * generata sara' `Struct_T` dove T e'il nome del tipo. Per esempio 
+>    * con u32: `Struct_u32`.
+>    */
 >   #define _STRUCT_ELEM(T) typedef struct VX_TEMPLATE_NAME(T, Struct) {\
 >       T elem;\
 >   }
 >
->   /* Creazione di una funzione per ottenere elem da Struct. Il nome della funzione generata sara' `struct_get_elem_T`, dove T e'il nome del tipo. Per esempio con u32: `struct_get_elem_u32`. */
+>   /* Creazione di una funzione per ottenere elem da Struct. Il nome
+>    * della funzione generata sara' `struct_get_elem_T`, dove T e'il
+>    * nome del tipo. Per esempio con u32: `struct_get_elem_u32`.
+>    */
 >   #define _STRUCT_GET_ELEM_INL(T) T VX_TEMPLATE_NAME(T, struct_get_elem)(VX_TEMPLATE_NAME(T, Struct)* struct) {\
 >       return struct->elem;
 >   }
@@ -200,10 +230,14 @@ La libreria porta le seguenti features:
 >   /* Deinizializzazione del vettore. */
 >   VX_T(i32, vx_vector_free)(&vec);
 >
->   /* Creazione di un'HashMap di interi. La key e'sempre un intero unsigned a 64 bit.  */
+>   /* Creazione di un'HashMap di interi. La key e'sempre un intero 
+>    * unsigned a 64 bit.
+>    */
 >   VX_T(i32, vx_HashMap) map = VX_T(i32, vx_HashMap)();
 >
->   /* Inserimento valori. Il primo parametro è il valore, il secondo è una chiave. */
+>   /* Inserimento valori. Il primo parametro è il valore, il secondo 
+>    * è una chiave.
+>    */
 >   VX_T(i32, vx_hashmap_insert)(&map, 100, 0);
 >   VX_T(i32, vx_hashmap_insert)(&map, 999, 3);
 >
@@ -290,7 +324,7 @@ Nella seconda fase invece sono eseguiti i seguenti passi:
 
 ### vx_WindowInputHelper
 `vx_WindowInputHelper` è una struttura che permette all'utente di facilmente ottenere informazioni sull'input.  
-Si nota che questa struttura non legge gli input automaticamente, quindi viene automaticamente aggiornato dalla finestra ogni frame prima della chiamata della funzione `logic`.
+Si nota che questa struttura non legge gli input automaticamente, quindi viene aggiornato dalla finestra ogni frame prima della chiamata della funzione `logic`.
 
 Gli input da parte dell'utente possono essere ottenuti accedendo ai seguenti fields:
 - `delta_time`: il tempo passato dall'ultimo frame
@@ -707,7 +741,7 @@ E' possibile vedere un esempio nelle seguenti immagini (<i>il frattale intero, a
 
 Si può notare che nel secondo screenshot si hanno due repliche dell'immagine iniziale.
 
-Un'altra caratteristica dei frattali è il fatto che, grazie al fatto di essere generati da una formula matematica, è possibile zoomare all'teoricamente infinito.
+Un'altra caratteristica dei frattali è il fatto che, grazie al fatto di essere generati da una formula matematica, è possibile zoomare teoricamente all'infinito.
 
 ## Il Frattale di Mandelbrot
 Nel nostro caso è stato utilizzato il frattale di MandelBrot. Quest'ultimo si basa sul considerare la posizione (bidimensionale) di un punto come un numero complesso, dove il componente `x` del punto corrisponde alla parte `reale` del complesso, mentre la componente `y` corrisponde alla parte `immaginaria`.
@@ -722,9 +756,27 @@ Il programma prevede la possibilità di cambiare la scala di colori utilizzata e
 
 ---
 # L'Applicazione
+Questa sezione spiega nel dettaglio il funzionamento del visualizzatore del Set.
+
+Sebbene la complicatezza di tale app non richieda l'utilizzo di una soluzione Second-Layer, essa è comunque stata utilizzata per motivi di dimostrazione, quindi saranno presenti due stati, per la `modalità 2D` e la `modalità 3D`.
+
+Ovviamente sarà anche presente uno stato globale. Quest'ultimo conterrà tutte le strutture necessarie al disegno attraverso Sokol e i parametri che sono utilizzati per modificare la visualizzazione del frattale.
+
+Le informazioni per gli stati `2D` e `3D` saranno invece rispettivamente una camera ortografica e prospettica.
+
+Oltre a questo, la differenza tra gli stati sono il differente processo degli input e il numero di triangoli disegnati (`mode3D` disegna 12 triangoli, 6 facce di un cubo, mentre `mode2D` ne renderizza 2, ovvero 1 faccia).
+
+Il cambio di stato avviene attraverso la pressione di un pulsante nella GUI generata da Nuklear.
 
 ## Visualizzazione del frattale
 Il frattale è renderizzato attraverso una particolare `fragment shader` e mappato ad un cubo (nella modalità 2D viene disegnata solo una faccia) la quale applica i passaggi spiegati nei paragrafi precedenti.
+
+Si nota che i vari parametri condivisi con la CPU permettono di:
+- modificare la posizione
+- modificare la scala
+- modificare il colore
+- modificare il numero di iterazioni massime
+- modificare il valore per il quale un numero viene considerato tendente ad infinito (inserito solo per curiosità, offre risultati interessanti solo se posto a bassi valori)
 
 Il sorgente della shader è questo:
 > ``` glsl
@@ -789,3 +841,79 @@ Il sorgente della shader è questo:
 >       frag_color = vec4(res * color.r, res * color.g, res * color.b, 1.0f);
 >   }
 > ```
+
+L'applicazione della prospettiva avviene attraverso la `vertex shader`, tuttavia quest'ultima viene omessa perché la spiegazione delle trasformazioni è al di fuori dello scopo di questo documento. Se si desidera comunque approfondire, visitare il [codice sorgente](https://github.com/BlackHole00/Mandelbrot/blob/master/res/shaders/mandelbrot.vs) o consultare la [guida della camera](https://learnopengl.com/Getting-started/Camera).
+
+## Problemi
+L'applicazione non è perfetta: sono presenti alcune pecche.
+
+### Perdita di precisione
+La prima è la perdita di precisione in grandi livelli di zoom. Tutti i calcoli sono
+avvengono attraverso l'utilizzo di float. Questi ultimi non hanno precisione infinita, perciò l'immagine diventerà pixelata dopo un certo livello di ingrandimento.  
+L'utilizzo di numeri double non è tuttavia una viabile soluzione, in quanto non sono supportati in tutte le schede grafiche e possono deteriorare molto la performance.
+
+Questo screenshot mostra il problema:
+
+![precision error](imgs/precision_problem.png)
+
+### Performance
+Il programma è stato testato su un computer con una scheda grafica che si può considerare potente (<i>RX 580 con 4 GB di vram</i>). Non ho mai avuto problemi di performance e l'applicazione funziona a 144 fps fissi.
+
+Il programma è stato successivamente testato su un computer scolastico, che non ha offerto performance simili (30 fps instabili, 60 in alcuni casi, 15 in altri).
+
+Questo problema può essere risolto utilizzando un `framebuffer` per ricalcolare il frattale solo quando necessario. Al momento attuale è tuttavia preferibile aspettare l'implementazione del `renderer`, che renderebbe tale situazione più facile da implementare.
+
+---
+# Conclusioni
+In conclusione il progetto è stato un successo.
+
+E'stato creato un framework molto modulare, che può essere facilmente ampliato. Nel futuro, quando quest'ultimo sarà più maturo, specialmente nei moduli `logic` e `gfx`, proverò a creare un semplice gioco, per poi cominciare a lavorare su un progetto più serio.  
+Il mio obiettivo finale è quello di creare un clone di Minecraft, un traguardo che ho già provato a raggiungere (a [questo link](https://github.com/BlackHole00/CraftME) si può accedere al mio migliore tentativo).
+
+Queste sono le features che voglio implementare al framework prima di creare il semplice gioco:
+- Implementazione di un `renderer`, e di un `render-graph`
+- Implementazione di un `allocatore di memoria per la GPU`. Al momento attuale tutti i buffer sono allocati con una dimensione statica. Avendo un allocatore sarà possible implementare un ridimensionamento dinamico.
+- Implementazione di un `resource manager`, che possa essere utilizzato in modo asincrono
+- Implementazione di un `task manager`, che possa eseguire facilmente la logica del codice in maniera parallela
+- Implementazione di più componenti
+- Migliore framework per la gestione della memoria in `vx_utils`, rendendo possibile il salvataggio di informazioni aggiuntive all'allocazione di memoria e al momento della pulizia, facilitando il debug dell'applicazione.
+- Prendere in considerazione `Wgpu` come alternativa a `Sokol`, in quanto più flessibile, ma leggermente più complicata
+- Dividere il visualizzatore ed il framework in due repository separate
+- Trovare un nome migliore per il framework... `vx_lib`?
+
+Queste invece sono le features da implementare al visualizzatore del frattale per considerarlo realmente completo:
+- Implementare una forma buffering del frattale, salvandolo su una texture, quindi calcolarlo solo quando necessario, non ogni frame. Questa feature potrebbe essere facilmente inserita se il `renderer` fosse già implementato
+- Sfruttando il buffering renderer possibile il calcolo del set nella GPU, potenzialmente in parallelo, utilizzando matematica a precisione arbitraria per ottenere uno zoom realmente infinito
+- Riscrivere la parte di disegno utilizzando `Wgpu` e le `compute shader`, che premetterebbero di calcolare il frattale in parallelo sulla scheda grafica
+
+Molto probabilmente il visualizzatore non verrà più modificato, ma la libreria sì.
+
+## Note aggiuntive:
+### Building
+Una volta che un compilatore e cmake sono stati installati è possibile buildare l'applicazione con i seguenti passaggi:
+> ``` bat
+> git clone https://github.com/BlackHole00/Mandelbrot --recursive
+> cd Mandelbrot
+> mkdir build
+> cd build
+> cmake ..
+> cmake --build .
+> ```
+
+Allora sarà possibile avere un eseguibile (la locazione dipende da compilatore a compilatore). Per eseguire il programma senza problemi è necessario copiare la cartella `res` nella root del progetto, nella stessa cartella dell'applicazione compilata.
+
+Sarà allora possibile eseguire il visualizzatore.
+
+---
+# Sitografia
+- Ispirazione originale: https://stackoverflow.com/questions/25478152/mandelbrot-set-in-a-fragment-shader-version-330
+- Teoria matematica: https://it.wikipedia.org/wiki/Insieme_di_Mandelbrot
+- GLFW: https://www.glfw.org/
+- HandmadeMath: https://github.com/HandmadeMath/Handmade-Math
+- Sokol: https://github.com/floooh/sokol
+- Glad: https://glad.dav1d.de/
+- Nuklear: https://github.com/Immediate-Mode-UI/Nuklear
+- CMake: https://cmake.org/
+- Ninja: https://ninja-build.org/
+- LearnOpenGl: https://learnopengl.com/ (un buon posto per cominciare con la computer grafica, ho cominciato da qui, due anni fa)
+- Sokol Samples: https://floooh.github.io/sokol-html5/ (al momento della scrittura, il migliore metodo per imparare Sokol)

@@ -68,6 +68,8 @@ void mb_global_init(mb_GlobalData* global_data) {
     /* Get the sources of the shaders. */
     char* vs_source = vx_filepath_get_content("res/shaders/mandelbrot.vs");
     char* fs_source = vx_filepath_get_content("res/shaders/mandelbrot.fs");
+    VX_ASSERT("vs_source is NULL. Does the source file exists?", vs_source != NULL);
+    VX_ASSERT("fs_source is NULL. Does the source file exists?", fs_source != NULL);
 
     /* Tell the GPU how to use the sources and how to read the GPU shared data (uniforms, not buffers). */
     global_data->gfxData.shader = sg_make_shader(&(sg_shader_desc){
