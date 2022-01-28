@@ -3,8 +3,6 @@
 in vec2 coord;
 out vec3 color;
 
-uniform sampler2D texture;
-
 void main() {
-  color = texture(texture, coord);
+    color = vec3(1.0, 0.0, 0.0);
 }

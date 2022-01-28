@@ -568,3 +568,224 @@ Verranno utilizzati due stati: uno che incrementa il contatore ogni frame ed uno
 >       return 0;
 >   }
 > ```
+
+# GFX MODULE
+Questo modulo, nel futuro conterrà strutture dati utili per rendere facile il rendering.  
+Per esempio nel futuro saranno inseriti un allocatore di memoria per i buffer nella scheda grafica ed un renderer per facilmente gestire buffer, textures e framebuffers, quindi creando un [render graph](https://github.com/gfx-rs/gfx/wiki/Frame-graphs).
+
+Al momento attuale contiene solo `vx_Camera`.
+
+## vx_Camera
+Questa struttura provvede una camera, che produce trasformazioni prospettiche o ortografiche che possono essere applicate dalla GPU.  
+Il funzionamento preciso della camera non viene spiegato nella precisione, in quanto non è il principale scopo di questa documentazione. Se si vuole comunque una spiegazione si può consultare il seguente [link](https://learnopengl.com/Getting-started/Camera).
+
+# LOGIC MODULE
+Questo modulo contiene tutto quello che riguarda una possibile logica del gioco.
+
+Al momento contiene solo un insieme di <i>componenti</i> che possono essere utilizzati per creare una semplice logica.  
+Nel futuro verranno implementati molti sistemi, come un gestore di risorse, un task-scheduler ed eventualmente un [Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system).
+
+## Entità e Componenti
+Per entità si intendono strutture dedicate alla logica del gioco che contengono componenti.  
+Per componente si intende una struct per salvare un piccolo ammontare di informazioni legati ad un singolo aspetto dell'entità.
+
+Il modulo, al momento attuale, provvede di default solo componenti legati alle trasformazioni (quindi posizione, rotazione e scala), ma, siccome un componente è una semplice struttura, è possibile aggiungerne altri facilmente.
+
+Per esempio se si immagina un entità guerriero, sarà formata dai seguenti componenti:
+- posizione
+- vita
+- danno
+
+Ogni componente è indipendente dall'entità.
+
+Si ricorda infine che è preferibile creare piccoli componenti che interagiscono tra di loro, evitando di crearne di grandi, che non sono modulari. Ci si allontana quindi da una classica struttura logica OOP ad <i>"albero"</i>, ma ci si avvicina ad un'astrazione altamente basata su <i>pseudo-inferface</i> e <i>pseudo-traits</i> (come incoraggia anche il linguaggio di programmazione [rust](https://www.rust-lang.org/)).
+
+---
+# Rendering sulla GPU, <i>aka: "Perché la mia finestra non disegna nulla?"</i>
+Questa sezione offrirà una <i>"veloce"</i> spiegazione di come è possibile renderizzare un semplice quadrato utilizzando la scheda grafica. Si nota che verrà spiegato il funzionamento in generale, senza andare nel dettaglio per ogni specifica API o nel funzionamento di Sokol.
+
+La teoria spiegata è facilmente applicabile a tutte le librerie, con cambiamenti logici non troppo grandi.
+
+Questo sarà il risultato di quello spiegato:
+
+![quad](imgs/quad.png)
+
+Prima di cominciare si fa un piccolo riassunto dei passi necessari, che verranno spiegati nei parametri successivi:
+- creazione di un <i>vertex buffer</i> e di un <i>index buffer</i>
+- creazione, compilazione e linkaggio di una <i>vertex shader</i> e di una <i>fragment shader</i>
+- definizione del formato dei buffer
+- settaggio degli stati e binding degli elementi menzionati sopra
+- chiamata di disegno
+
+Si raccomanda di tenere in mente che la GPU è un grado di disegnare solo triangoli. Figure geometriche più complesse sono solo più triangoli messi assieme.  
+Un quadrato è formato da due triangoli.
+
+Infine si fa notare che un contenuto della finestra viene pulito ad ogni frame, quindi sarà necessario ripetere le ultime due fasi molteplici volte al secondo.
+
+## Buffers
+Un `buffer` è un ammasso di dati che vengono inviati alla scheda grafica. Questi ultimi determinano cosa viene disegnato.
+
+Questi ultimi vengono divisi in molteplici categorie. Quelle che sono state utilizzate sono le seguenti:
+- `vertex buffer`: contengono la posizione dei vertici nello schermo.
+- `index buffer`: indica da quali vertici è formato un triangolo. Fa riferimento al `vertex buffer`.
+
+Per esempio:
+
+![buffer explanation](imgs/quad_explanation_1.png)
+
+## Shader
+Le `shaders` sono piccoli programmi che vengono eseguiti nella scheda grafica.  
+Possono essere utilizzati in molte situazioni, ma le più comuni sono:
+- `vertex shader`: processano la posizione dei vertici, come per esempio nel caso di applicare una trasformazione prospettica o, in un gioco più complesso, simulare il vento nelle foglie degli alberi.
+- `fragment shader`: calcolare il colore di ogni singolo pixel di un determinato triangolo. Il visualizzatore di frattali utilizza questa shader per calcolare il set di Mandelbrot.
+
+Queste ultime possono essere scritte in molti linguaggi, ma quello utilizzato nel progetto è `GLSL`.
+
+Queste sono le shader utilizzate nell'esempio (rispettivamente vertex e fragment):
+- <i>quad.vs</i>
+> ``` glsl
+>   #version 330
+>
+>   /* Acquisizione della posizione dei vertici dal buffer. */
+>   layout(location=0) in vec2 position;
+>
+>   /* Funzione main: calcolo posizione dei vertici. */
+>   void main() {
+>       /* gl_Position e'una variabile built-in che indica la posizione
+>        * del vertice. Vengono utilizzate le informazioni del buffer
+>        * senza modifiche.
+>        */
+>       gl_Position = vec4(position, 1.0f);
+>   }
+> ```
+- <i>quad.fs</i>
+> ``` glsl
+>   #version 330
+>
+>   /* Definizione variabile di uscita. */
+>   out vec3 color;
+>
+>   /* Funzione main: calcolo del colore dei vertici. */
+>   void main() {
+>       /* Colore in formato RGB: rosso. */
+>       color = vec3(1.0, 0.0, 0.0);
+>   }
+> ```
+
+## Definizione del formato dei buffer
+Sebbene le shader abbiano alcune informazioni sul formato dei buffer è necessario descrivere alla scheda grafica il formato di esso, quindi definire quali byte indicano quale data.
+
+Nel caso dei vertici sopra citati i procedimento è semplice, ma se si intende inserire informazioni extra (come le coordinate di una texture o un colore aggiuntivo) è necessario fare qualche procedimento logico aggiuntivo, come il calcolo dei valori di offset nel buffer.
+
+## Stati e bindings
+Prima della chiamata del disegno è necessario fare in modo che siano utilizzati (quindi <i>bindati</i>) i giusti buffer, shaders e descrittori di formato.  
+Se non vengono eseguite queste operazioni il programma potrebbe fermarsi, non disegnare nulla o renderizzare garbage-data sulla finestra.
+
+La maggior parte degli errori avviene spesso in questa fase, in quanto non esistono facili metodi per il debug di questi problemi.
+
+## Chiamata per il disegno
+Una volta effettuato il binding è possibile disegnare il quadrato, indicando alla GPU il numero di indici presenti.
+
+Nel caso analizzato, verrà richiesto di renderizzare `6` indici (`3` per il primo triangolo e `3` per il secondo).
+
+Allora sarà possibile vedere il quadrato nello schermo.
+
+## Uniforms
+Questa feature non è stata utilizzata nell'esempio, ma viene usata nel visualizzatore.
+
+Le `uniform` sono speciali tipi di variabili che possono essere lette sia dalle shader, che dalla CPU, quindi offrono un metodo per dinamicamente condividere memoria tra il programma e la GPU.
+
+---
+# Frattali
+Per immagine frattale si intende un'immagine generata da una formula matematica.  
+Molti frattali hanno le caratteristiche di generare una texture auto-similare, che ha la proprietà di ripetersi su scale diverse, sebbene rimanendo sempre diversa.
+
+E' possibile vedere un esempio nelle seguenti immagini (<i>il frattale intero, a confronto con uno zoom su una determinata parte</i>):
+
+![frattale intero](imgs/2d_screenshot.png)
+![frattale zoom](imgs/mandelbrot_zoom.png)
+
+Si può notare che nel secondo screenshot si hanno due repliche dell'immagine iniziale.
+
+Un'altra caratteristica dei frattali è il fatto che, grazie al fatto di essere generati da una formula matematica, è possibile zoomare all'teoricamente infinito.
+
+## Il Frattale di Mandelbrot
+Nel nostro caso è stato utilizzato il frattale di MandelBrot. Quest'ultimo si basa sul considerare la posizione (bidimensionale) di un punto come un numero complesso, dove il componente `x` del punto corrisponde alla parte `reale` del complesso, mentre la componente `y` corrisponde alla parte `immaginaria`.
+
+Allora si applica il seguente metodo:
+- si calcola un nuovo numero, ottenendo il quadrato di quello precedente ed aggiungendolo a se stesso, quindi:
+> $ z_{n + 1} = {z_n}^2 + z_n $
+- si allora calcola il numero di iterazioni necessarie per esso a <i>tendere all'infinito</i> e si colora il pixel di conseguenza (bianco se utilizza molti cicli o nero se ne utilizza pochi).  
+Per motivi di performance si è messo un limite al numero massimo di iterazioni che un punto può impiegare. Se dopo tali operazioni il numero non tende ancora al'infinito si ritiene <i>"stabile"</i> e viene disegnato di bianco.
+
+Il programma prevede la possibilità di cambiare la scala di colori utilizzata e di modificare il numero di iterazioni massime, facendo in modo di incrementare il livello di dettaglio al costo di performance.
+
+---
+# L'Applicazione
+
+## Visualizzazione del frattale
+Il frattale è renderizzato attraverso una particolare `fragment shader` e mappato ad un cubo (nella modalità 2D viene disegnata solo una faccia) la quale applica i passaggi spiegati nei paragrafi precedenti.
+
+Il sorgente della shader è questo:
+> ``` glsl
+>   #version 410 core
+>
+>   /* Settaggio alta precisione per le operazioni matematiche. */
+>   precision highp float;
+>
+>   /* Definizione input e output. */
+>   out vec4 frag_color;
+>   in vec2 coord;
+>
+>   /* Variabili condivise con la CPU. */
+>   uniform float maxIterations;
+>   uniform vec2 position;
+>   uniform vec2 scale;
+>   uniform vec4 color;
+>   uniform float maxValue;
+>
+>   vec2 squareImaginary(vec2 number){
+>       vec2 vec;
+>       vec.x = number.x * number.x - number.y * number.y;
+>       vec.y = 2 * number.x * number.y;
+>
+>   	return vec;
+>   }
+>
+>   float pseudoLenght(vec2 vec) {
+>       return sqrt(vec.x * vec.x + vec.y * vec.y);
+>   }
+>
+>   float iterateMandelbrot(vec2 localCoord) {
+>   	vec2 z;
+>       z.x = localCoord.x;
+>       z.y = localCoord.y;
+>
+>   	for (int i = 1; i < maxIterations; i++) {
+>   		vec2 tmp = squareImaginary(z);
+>           z.x = tmp.x + localCoord.x;
+>           z.y = tmp.y + localCoord.y;
+>
+>           /* Se la "lunghezza" del numero è maggiore di maxValue (4.0) di default
+>            * allora il numero tende all'infinito.
+>            */
+>   		if (pseudoLenght(z) > maxValue) {
+>               return i / maxIterations;
+>           }
+>   	}
+>   	return 1.0;
+>   }
+>
+>   void main() {
+>       /* Calcolo trasformazioni. */
+>       vec2 startCoord;
+>       startCoord.x = (coord.x / scale.x + position.x);
+>       startCoord.y = (coord.y / scale.y + position.y);
+>
+>       /* Calcolo del valore del pixel. */
+>       float res = iterateMandelbrot(startCoord);
+>
+>       /* Applicazione del colore. */
+>       frag_color = vec4(res * color.r, res * color.g, res * color.b, 1.0f);
+>   }
+> ```
