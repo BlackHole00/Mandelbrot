@@ -1,3 +1,6 @@
 [submodule "libs/glfw"]
 	path = libs/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "libs/vx_utils"]
+	path = libs/vx_utils
+	url = https://github.com/BlackHole00/vx_utils
