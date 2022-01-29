@@ -22,3 +22,8 @@ void mb_global_init(mb_GlobalData* global_data);
  * last state has been run.
  */
 void mb_global_close(mb_GlobalData* global_data);
+
+/**
+ * Used to update the fractals' color in disco mode.
+ */
+void mb_shared_disco_update_colors(mb_GlobalData* general_data);

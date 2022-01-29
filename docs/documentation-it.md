@@ -36,7 +36,7 @@ Un ovvio esempio è l'operator overloading. Si consideri questo codice scritto i
   std::cout << !f << std::endl;
 ```
 Ebbene, sapendo che la classe `NumeroNaturale` rappresenta un numero e che quest'ultima è inizializzata a `1`, quale dovrebbe essere il risultato di `!f`? Secondo pura logica si dedurrebbe che `!1` = `0`. Questa assunzione è errata. L'operatore `!` in questo codice ritorna il fattoriale del numero. Questo comportamento è impossibile da determinare senza precedente conoscenza del programma. C'è una chiara mancanza di leggibilità.  
-Questo non è il solo problema: non è chiaro se sia in primo luogo chiamata un funzione che possa modificare i valori nel codice.
+Questo non è il solo problema: non è chiaro se sia in primo luogo chiamata una funzione che possa modificare i valori nel codice.
 
 Secondo la mia filosofia il linguaggio di programmazione perfetto avrebbe bisogno delle seguenti caratteristiche:
 - <b>semplicità</b>. L'intero linguaggio deve poter essere apprendibile da un comune mortale in una tempistica accettabile;
@@ -282,7 +282,7 @@ Quest'ultima si interfaccia ad altre librerie come `DirectX`, `Metal`, `OpenGL` 
 Si nota però che Sokol rimane comunque molto a basso livello e non fornisce quasi alcuna astrazione in più rispetto alle API menzionate sopra.
 
 ## [Glad](https://glad.dav1d.de/)
-Per vantaggi legati al debug del codice ed alla velocità di compilazione, Sokol è stato configurato per utilizzare `OpenGL`. Quest'API tuttavia presenta il problema di avere un'inizializzazione particolare (diversamente dalle altre). Per questo è necessaria una libreria per fare questo lavoro. Glad ( ) è in grado di farlo.
+Per vantaggi legati al debug del codice ed alla velocità di compilazione, Sokol è stato configurato per utilizzare `OpenGL`, la quale richiede tuttavia un'inizializzazione particolare. Per questo è necessaria una libreria per fare questo lavoro. Glad è in grado di farlo.
 
 ## [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear)
 Nuklear è una libreria che fornisce una <i>immediate-mode GUI</i>. Quest'ultima è in grado, una volta forniti in input i dati necessari di generare informazioni (<i>buffer</i>) leggibili dalla scheda grafica che possono essere, con la giusta implementazione, renderizzate indipendentemente dalle librerie utilizzate.  
@@ -312,7 +312,7 @@ Il modulo OS è diviso in ulteriori due parti:
 - Second Layer
 
 ## First Layer
-Questo strato è il primo. Provvede astrazioni per interfacciarsi con GLFW, Sokol e Nuklear. Provvede strutture quindi per gestire una finestra, per gestire l'input e per gestire un game loop.  
+Questo strato è il primo. Provvede astrazioni per interfacciarsi con GLFW, Sokol e Nuklear. Fornisce quindi strutture per gestire una finestra, per gestire l'input e per gestire un game loop.  
 In questo layer tale game loop viene creato attraverso l'uso di puntatori a funzione salvati in `vx_Window`, che vengono chiamati agli opportuni momenti, con i giusti parametri. L'utente può anche definire un puntatore ai propri dati, evitando di utilizzare variabili globali.  
 Queste sono le funzioni di callback che un'applicazione può implementare:
 - `void init(vx_UserStatePtr data_ptr, vx_WindowControl* window_control)`: chiamata all'inizializzazione dei dati. Prima dell'esecuzione del game loop.
@@ -362,7 +362,7 @@ La funzione `vx_inputhelper_update_nuklear_input()` utilizza l'input helper per 
 
 ### vx_WindowControl
 Questa struttura permette di controllare una `vx_Window` senza interfacciarsi direttamente su di essa.  
-Questo permette di diminuire il numero di bug nel caso di operazioni che la libreria non si aspetta. L'utente può comunque accedere alla finestra `vx_Window` ed addirittura a quella GLFW se lo desidera.  
+Questo consente di diminuire il numero di bug nel caso di operazioni che la libreria non si aspetta. L'utente può comunque accedere alla finestra `vx_Window` ed addirittura a quella GLFW se lo desidera.  
 Si nota che se l'utente ha tuttavia bisogno di fare queste operazioni la libreria dovrebbe essere modificata in modo da, sempre nel rispetto della semplicità, offrire un metodo utilizzando `vx_WindowControl`.  
 Alcune interessanti funzioni sono:
 - `vx_windowcontrol_exit()`: richiede la chiusura dell'applicazione
@@ -482,7 +482,7 @@ E'possibile successivamente chiamare `vx_statemanager_run()` per eseguire l'appl
 Diversamente da `vx_Window`, `vx_StateManager` alloca memoria sull'heap (per l'hash map), quindi prima della terminazione del programma è necessario chiamare `vx_hashmap_free()` per liberare la memoria allocata.
 
 ### Esempio di un'applicazione utilizzante gli stati
-In questa sezione verrà riscritto l'esempio per il First-Layer utilizzando gli stati. Si fa notare che questo programma è solo a scopo dimostrativo: è molto più semplice nella sua iterazione precedente
+In questa sezione verrà riscritto l'esempio per il First-Layer utilizzando gli stati. Si fa notare che questo programma è solo a scopo dimostrativo: è molto più semplice nella sua iterazione precedente.
 
 Verranno utilizzati due stati: uno che incrementa il contatore ogni frame ed uno che lo diminuisce ogni frame. Sarà anche salvato il numero di volte che ogni stato viene utilizzato, per porre un esempio per le informazioni per-stato. E'possibile cambiare stato utilizzando la space bar.
 
@@ -643,14 +643,28 @@ Per componente si intende una struct per salvare un piccolo ammontare di informa
 
 Il modulo, al momento attuale, provvede di default solo componenti legati alle trasformazioni (quindi posizione, rotazione e scala), ma, siccome un componente è una semplice struttura, è possibile aggiungerne altri facilmente.
 
-Per esempio se si immagina un entità guerriero, sarà formata dai seguenti componenti:
-- posizione
-- vita
-- danno
+Per esempio se si immagina un entità `Guerriero`, sarà formata dai seguenti componenti:
+- `posizione`
+- `vita`
+- `danno`
 
 Ogni componente è indipendente dall'entità.
 
-Si ricorda infine che è preferibile creare piccoli componenti che interagiscono tra di loro, evitando di crearne di grandi, che non sono modulari. Ci si allontana quindi da una classica struttura logica OOP ad <i>"albero"</i>, ma ci si avvicina ad un'astrazione altamente basata su <i>pseudo-inferface</i> e <i>pseudo-traits</i> (come incoraggia anche il linguaggio di programmazione [rust](https://www.rust-lang.org/)).
+Si ricorda infine che è preferibile creare piccoli componenti che interagiscono tra di loro, evitando di crearne di grandi, che non sono modulari. Ci si allontana quindi da una classica struttura logica OOP ad <i>"albero"</i>, ma ci si avvicina ad un'astrazione altamente basata su <i>pseudo-inferface</i> e sul design <i>data oriented</i> (come incoraggia anche il linguaggio di programmazione [rust](https://www.rust-lang.org/)).
+
+Quindi per esempio se si immagina un Entità `Jeep`, quest'ultima sarà formata dai componenti di `posizione`, `vita` e `caratteristiche fisiche`.
+E' sconsigliabile creare una `Jeep`, che contiene un componente `Macchina`, che contiene un componente `Veicolo`, che contiene un componente `Entità`.
+
+Un'eventuale funzione per far muovere la `Jeep` prenderà quindi, come puntatori costanti o meno, i componenti del quale la jeep è costruita, come nell'esempio:
+```c
+void car_move(vx_Position* position, const PhysicsData* physics_data);
+```
+Si eviterà di utilizzare la seguente funzione:
+```c
+void jeep_move(Jeep* jeep);
+```
+
+Ulteriori esempi su questa filosofica possono essere trovati al seguente [link](https://www.youtube.com/watch?v=ZHqFrNyLlpA&list=PLmV5I2fxaiCKfxMBrNsU1kgKJXD3PkyxO&index=6).
 
 ---
 # Rendering sulla GPU, <i>aka: "Perché la mia finestra non disegna nulla?"</i>
@@ -723,6 +737,16 @@ Queste sono le shader utilizzate nell'esempio (rispettivamente vertex e fragment
 >       color = vec3(1.0, 0.0, 0.0);
 >   }
 > ```
+
+### Bloom
+Una piccola hack implementata all'ultimo minuto è quella del bloom.
+
+Con questa nuova "feature" è possible far sembrare il frattale luminoso. La tecnica utilizzata per ottenere tale effetto è chiedere alla `shader` di disegnare colori più chiari del bianco.  
+Non è assolutamente una soluzione seria, ma il risultato è molto carino, quindi è stato mantenuto.
+
+Un esempio si può vedere nel seguente screenshot:
+
+![bloom](imgs/bloom.png)
 
 ## Definizione del formato dei buffer
 Sebbene le shader abbiano alcune informazioni sul formato dei buffer è necessario descrivere alla scheda grafica il formato di esso, quindi definire quali byte indicano quale data.

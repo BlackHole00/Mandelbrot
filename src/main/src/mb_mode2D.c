@@ -32,12 +32,20 @@ vx_StateUID mb_mode2d_logic(mb_GlobalData* general_data, mb_Mode2DData* state, v
     nk_glfw_set_context(ctx);
     returnUID = mb_control_ui_mode2d(ctx, general_data, state);
 
-    if (!vx_inputhelper_update_nuklear_input(input, false)) {
+    if (input->keys[GLFW_KEY_G].just_pressed) {
+        general_data->gui_enabled = !general_data->gui_enabled;
+    }
+
+    if ((general_data->gui_enabled && !vx_inputhelper_update_nuklear_input(input, false)) || !general_data->gui_enabled) {
         mb_input_mode2d(general_data, input);
     }
 
     if(input->keys[GLFW_KEY_ESCAPE].just_pressed) {
         vx_windowcontrol_exit(window);
+    }
+
+    if (general_data->disco_mode) {
+        mb_shared_disco_update_colors(general_data);
     }
 
     return returnUID;
@@ -54,10 +62,20 @@ void mb_mode2d_draw(mb_GlobalData* general_data, mb_Mode2DData* state) {
     sg_begin_default_pass(&general_data->gfxData.passAction, general_data->gfxData.screenWidth, general_data->gfxData.screenHeight);
     sg_apply_pipeline(general_data->gfxData.pipelines);
     sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &SG_RANGE(general_data->transformBlock));
+
+    /* Apply bloom */
+    struct nk_colorf backup = general_data->mandelbrotInfoBlock.color;
+    general_data->mandelbrotInfoBlock.color.r *= general_data->bloom;
+    general_data->mandelbrotInfoBlock.color.g *= general_data->bloom;
+    general_data->mandelbrotInfoBlock.color.b *= general_data->bloom;
     sg_apply_uniforms(SG_SHADERSTAGE_FS, 0, &SG_RANGE(general_data->mandelbrotInfoBlock));
+    general_data->mandelbrotInfoBlock.color = backup;
+
     sg_apply_bindings(&general_data->gfxData.bindings);
     sg_draw(0, 6, 1);
-    snk_render(general_data->gfxData.screenWidth, general_data->gfxData.screenHeight);
+    if (general_data->gui_enabled) {
+        snk_render(general_data->gfxData.screenWidth, general_data->gfxData.screenHeight);
+    }
     sg_end_pass();
     sg_commit();
 }

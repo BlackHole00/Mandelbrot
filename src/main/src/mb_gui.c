@@ -69,13 +69,31 @@ void mb_control_ui_common(struct nk_context* ctx, mb_GlobalData* general_data) {
     nk_slider_float(ctx, 1.0f, &general_data->mandelbrotInfoBlock.maxValue, 4.0f, 0.001f);
     nk_layout_row_end(ctx);
 
-    nk_layout_row_dynamic(ctx, 10, 1);
-    nk_spacing(ctx, 1);
-    nk_label(ctx, "color: ", NK_TEXT_LEFT);
+    if (!general_data->disco_mode) {
+        nk_layout_row_dynamic(ctx, 10, 1);
+        nk_spacing(ctx, 1);
+        nk_label(ctx, "color: ", NK_TEXT_LEFT);
 
-    nk_layout_row_begin(ctx, NK_DYNAMIC, 200, 1);
+        nk_layout_row_begin(ctx, NK_DYNAMIC, 200, 1);
+        nk_layout_row_push(ctx, 1.0f);
+        general_data->mandelbrotInfoBlock.color = nk_color_picker(ctx, general_data->mandelbrotInfoBlock.color, NK_RGBA);
+        nk_layout_row_end(ctx);
+    } else {
+        nk_layout_row_begin(ctx, NK_DYNAMIC, 40, 2);
+        nk_layout_row_push(ctx, 0.45f);
+        nk_label(ctx, "disco speed: ", NK_TEXT_LEFT);
+        nk_layout_row_push(ctx, 1.0f);
+        nk_slider_float(ctx, 0.0f, &general_data->disco_speed, 5.0f, 0.01f);
+        nk_layout_row_end(ctx);
+    }
+    nk_layout_row_dynamic(ctx, 10, 1);
+    nk_checkbox_label(ctx, "disco", (nk_bool*)(&general_data->disco_mode));
+
+    nk_layout_row_begin(ctx, NK_DYNAMIC, 40, 2);
+    nk_layout_row_push(ctx, 0.45f);
+    nk_label(ctx, "bloom: ", NK_TEXT_LEFT);
     nk_layout_row_push(ctx, 1.0f);
-    general_data->mandelbrotInfoBlock.color = nk_color_picker(ctx, general_data->mandelbrotInfoBlock.color, NK_RGBA);
+    nk_slider_float(ctx, 1.0f, &general_data->bloom, 50.0f, 0.1f);
     nk_layout_row_end(ctx);
 
     nk_layout_row_dynamic(ctx, 10, 1);
@@ -103,7 +121,7 @@ vx_StateUID mb_control_ui_mode_selector(struct nk_context* ctx, vx_StateUID curr
 vx_StateUID mb_control_ui_mode2d(struct nk_context* ctx, mb_GlobalData* general_data, mb_Mode2DData* state) {
     vx_StateUID returnState = MB_MODE_2D;
 
-    if (nk_begin(ctx, "Zoom", nk_rect(50, 50, 250, 310),
+    if (nk_begin(ctx, "Mandelbrot - Press 'G' to Hide", nk_rect(50, 50, 250, 310),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE)
     ) {
@@ -118,7 +136,7 @@ vx_StateUID mb_control_ui_mode2d(struct nk_context* ctx, mb_GlobalData* general_
 vx_StateUID mb_control_ui_mode3d(struct nk_context* ctx, mb_GlobalData* general_data, mb_Mode3DData* state) {
     vx_StateUID returnState = MB_MODE_3D;
 
-    if (nk_begin(ctx, "Zoom", nk_rect(50, 50, 250, 310),
+    if (nk_begin(ctx, "Mandelbrot - Press 'G' to Hide", nk_rect(50, 50, 250, 310),
         NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
         NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE)
     ) {

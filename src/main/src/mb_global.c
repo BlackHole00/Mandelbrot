@@ -166,3 +166,35 @@ void mb_global_close(mb_GlobalData* global_data) {
     sg_destroy_pipeline(global_data->gfxData.pipelines);
     sg_destroy_shader(global_data->gfxData.shader);
 }
+
+void mb_shared_disco_update_colors(mb_GlobalData* general_data) {
+    general_data->mandelbrotInfoBlock.color.r += 1.0f/255.0f * general_data->disco_speed * (general_data->color_modes.r ? -1.0 : 1.0);
+    general_data->mandelbrotInfoBlock.color.g += 1.0f/255.0f * general_data->disco_speed * 1.5 * (general_data->color_modes.g ? -1.0 : 1.0);
+    general_data->mandelbrotInfoBlock.color.b += 1.0f/255.0f * general_data->disco_speed * 1.5 * 1.75 * (general_data->color_modes.b ? -1.0 : 1.0);
+
+    /* Not going to 1.0 or 0.0 because bloom. */
+    if (general_data->mandelbrotInfoBlock.color.r > 0.95f) {
+        general_data->color_modes.r = true;
+        general_data->mandelbrotInfoBlock.color.r = 0.95f;
+    }
+    if (general_data->mandelbrotInfoBlock.color.g > 0.95f) {
+        general_data->color_modes.g = true;
+        general_data->mandelbrotInfoBlock.color.g = 0.95f;
+    }
+    if (general_data->mandelbrotInfoBlock.color.b > 0.95f) {
+        general_data->color_modes.b = true;
+        general_data->mandelbrotInfoBlock.color.b = 0.95f;
+    }
+    if (general_data->mandelbrotInfoBlock.color.r < 0.075f) {
+        general_data->color_modes.r = false;
+        general_data->mandelbrotInfoBlock.color.r = 0.05f;
+    }
+    if (general_data->mandelbrotInfoBlock.color.g < 0.05f) {
+        general_data->color_modes.g = false;
+        general_data->mandelbrotInfoBlock.color.g = 0.05f;
+    }
+    if (general_data->mandelbrotInfoBlock.color.b < 0.05f) {
+        general_data->color_modes.b = false;
+        general_data->mandelbrotInfoBlock.color.b = 0.05f;
+    }
+}

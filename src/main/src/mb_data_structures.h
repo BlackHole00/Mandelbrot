@@ -107,11 +107,26 @@ typedef struct mb_GlobalData {
     mb_UniformMandelbrotInfoBlock mandelbrotInfoBlock;
     mb_UniformTransformBlock transformBlock;
     mb_GfxData gfxData;
+
+    bool gui_enabled;
+    bool disco_mode;
+    struct {
+        bool r;
+        bool g;
+        bool b;
+    } color_modes;
+    f32 bloom;
+    f32 disco_speed;
 } mb_GlobalData;
 VX_CREATE_DEFAULT(mb_GlobalData,
     .transformBlock = VX_DEFAULT(mb_UniformTransformBlock),
     .mandelbrotInfoBlock = VX_DEFAULT(mb_UniformMandelbrotInfoBlock),
-    .gfxData = VX_DEFAULT(mb_GfxData)
+    .gfxData = VX_DEFAULT(mb_GfxData),
+    .gui_enabled = true,
+    .disco_mode = false,
+    .disco_speed = 1.0f,
+    .color_modes = { 0 },
+    .bloom = 1.0f
 )
 
 /**
