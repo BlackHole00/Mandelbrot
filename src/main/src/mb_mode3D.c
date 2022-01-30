@@ -9,6 +9,7 @@
 
 #include "mb_gui.h"
 #include "mb_input.h"
+#include "mb_global.h"
 
 void mb_mode3d_init(mb_GlobalData* general_data, mb_Mode3DData* state, vx_WindowControl* window) {
     general_data->transformBlock.model = HMM_Mat4d(1.0f);

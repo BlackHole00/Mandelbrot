@@ -8,6 +8,7 @@
 
 #include "mb_input.h"
 #include "mb_gui.h"
+#include "mb_global.h"
 
 void mb_mode2d_init(mb_GlobalData* general_data, mb_Mode2DData* state, vx_WindowControl* window) {
     vx_windowcontrol_set_mouse_grab(window, false);
