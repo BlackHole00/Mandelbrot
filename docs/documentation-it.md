@@ -18,7 +18,7 @@ Come spiegato nella premessa, l'applicazione è stata costruita utilizzando una 
 Si ricorda che il visualizzatore utilizza la scheda grafica per i propri calcoli, perciò verrà anche fatta una <i>"veloce"</i> spiegazione sul come quest'ultimo è renderizzato.  
 Infine sarà possibile analizzare cosa sono i frattali, per poi analizzare l'app vera e propria.
 
-Si fa notare infine che il codice è <i>per la maggior parte</i> commentato (in special modo i file <i>header</i>, quindi se si hanno questioni sul funzionamento del programma è possibile sempre consultare il codice sorgente a [questo link](https://github.com/BlackHole00/Mandelbrot)).
+Si fa notare infine che il codice è <i>per la maggior parte</i> commentato (in special modo i file <i>header</i>, quindi se si hanno questioni sul funzionamento del programma è possibile sempre consultare il codice sorgente a [questo link](https://github.com/BlackHole00/Mandelbrot/tree/1.0.0)).
 
 ### Nota alla lettura da PDF
 L'intero documento è stato scritto in `markdown`, che fornisce una migliore esportazione HTML. E'preferibile leggere la documentazione a [questo link](https://github.com/BlackHole00/Mandelbrot/blob/master/docs/documentation-it.md).
