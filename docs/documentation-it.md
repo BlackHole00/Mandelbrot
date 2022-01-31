@@ -738,16 +738,6 @@ Queste sono le shader utilizzate nell'esempio (rispettivamente vertex e fragment
 >   }
 > ```
 
-### Bloom
-Una piccola hack implementata all'ultimo minuto è quella del bloom.
-
-Con questa nuova "feature" è possible far sembrare il frattale luminoso. La tecnica utilizzata per ottenere tale effetto è chiedere alla `shader` di disegnare colori più chiari del bianco.  
-Non è assolutamente una soluzione seria, ma il risultato è molto carino, quindi è stato mantenuto.
-
-Un esempio si può vedere nel seguente screenshot:
-
-![bloom](imgs/bloom.png)
-
 ## Definizione del formato dei buffer
 Sebbene le shader abbiano alcune informazioni sul formato dei buffer è necessario descrivere alla scheda grafica il formato di esso, quindi definire quali byte indicano quale data.
 
@@ -886,6 +876,16 @@ Il sorgente della shader è questo:
 
 L'applicazione della prospettiva avviene attraverso la `vertex shader`, tuttavia quest'ultima viene omessa perché la spiegazione delle trasformazioni è al di fuori dello scopo di questo documento. Se si desidera comunque approfondire, visitare il [codice sorgente](https://github.com/BlackHole00/Mandelbrot/blob/master/res/shaders/mandelbrot.vs) o consultare la [guida della camera](https://learnopengl.com/Getting-started/Camera).
 
+### Bloom
+Una piccola hack implementata all'ultimo minuto è quella del bloom.
+
+Con questa nuova "feature" è possible far sembrare il frattale luminoso. La tecnica utilizzata per ottenere tale effetto è chiedere alla `shader` di disegnare colori più chiari del bianco.  
+Non è assolutamente una soluzione seria, ma il risultato è molto carino, quindi è stato mantenuto.
+
+Un esempio si può vedere nel seguente screenshot:
+
+![bloom](imgs/bloom.png)
+
 ## Problemi
 L'applicazione non è perfetta: sono presenti alcune pecche.
 
@@ -945,6 +945,9 @@ Una volta che un compilatore e cmake sono stati installati è possibile buildare
 Allora sarà possibile avere un eseguibile (la locazione dipende da compilatore a compilatore). Per eseguire il programma senza problemi è necessario copiare la cartella `res` nella root del progetto, nella stessa cartella dell'applicazione compilata.
 
 Sarà allora possibile eseguire il visualizzatore.
+
+### Build precompilata
+Si ricorda che nella sezione release della pagina GitHub del progetto è disponibile una versione già compilata che è possibile scaricare ed eseguire.
 
 ---
 # Sitografia
