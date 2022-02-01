@@ -2,6 +2,7 @@
 
 #include <vx_utils.h>
 
+#include <sokol_gfx.h>
 #include <nuklear_args.h>
 #include <nuklear.h>
 #include <nuklear_sokol.h>

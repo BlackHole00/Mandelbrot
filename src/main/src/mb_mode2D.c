@@ -27,7 +27,7 @@ void mb_mode2d_init(mb_GlobalData* general_data, mb_Mode2DData* state, vx_Window
 }
 
 vx_StateUID mb_mode2d_logic(mb_GlobalData* general_data, mb_Mode2DData* state, vx_WindowControl* window, vx_WindowInputHelper* input) {
-    vx_StateUID returnUID;
+    vx_StateUID returnUID = MB_MODE_2D;
 
     struct nk_context *ctx = snk_new_frame();
     nk_glfw_set_context(ctx);
