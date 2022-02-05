@@ -8,12 +8,4 @@ add_executable(Main
     src/mb_global.h src/mb_global.c
 )
 
-target_link_libraries(Main PRIVATE VxUtils)
-target_link_libraries(Main PRIVATE Sokol)
-target_link_libraries(Main PRIVATE glfw)
-target_link_libraries(Main PRIVATE Nuklear)
-target_link_libraries(Main PRIVATE Glad)
-target_link_libraries(Main PRIVATE HandmadeMath)
-target_link_libraries(Main PRIVATE Os)
-target_link_libraries(Main PRIVATE Gfx)
-target_link_libraries(Main PRIVATE Logic)
+target_link_libraries(Main PRIVATE VxLib)
