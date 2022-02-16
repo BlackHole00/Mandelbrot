@@ -85,6 +85,7 @@ void mb_mode3d_draw(mb_GlobalData* general_data, mb_Mode3DData* state) {
 void mb_mode3d_resize(mb_GlobalData* general_data, mb_Mode3DData* state, vx_WindowControl* window, u32 width, u32 height) {
     general_data->gfxData.screenWidth = width;
     general_data->gfxData.screenHeight = height;
+    vx_camera_set_viewport_size(&state->camera, width, height);
 }
 
 void mb_mode3d_close(mb_GlobalData* general_data, mb_Mode3DData* state, vx_WindowControl* window) {}
