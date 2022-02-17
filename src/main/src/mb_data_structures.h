@@ -30,22 +30,22 @@ typedef enum mb_ModeUID {
  * This struct contains the data that is uploaded to the GPU in
  * order to draw the mandelbrot set.
  */
-typedef struct mb_UniformMandelbrotInfoBlock {
-    float maxIterations;
-    float xPosition;
-    float yPosition;
-    float xScale;
-    float yScale;
+typedef struct mb_Uniformmandelbrot_info_block {
+    float max_iterations;
+    float x_position;
+    float y_position;
+    float x_scale;
+    float y_scale;
     struct nk_colorf color;
     float resolution_rateo;
-    float maxValue;
-} mb_UniformMandelbrotInfoBlock;
-VX_CREATE_DEFAULT(mb_UniformMandelbrotInfoBlock, 
-    .maxIterations = 500,
-    .xPosition = 0.0f,
-    .yPosition = 0.0f,
-    .xScale = 1.0f,
-    .yScale = 1.0f,
+    float max_value;
+} mb_Uniformmandelbrot_info_block;
+VX_CREATE_DEFAULT(mb_Uniformmandelbrot_info_block, 
+    .max_iterations = 500,
+    .x_position = 0.0f,
+    .y_position = 0.0f,
+    .x_scale = 1.0f,
+    .y_scale = 1.0f,
     .color = {
         .r = 1.0f,
         .g = 1.0f,
@@ -53,19 +53,19 @@ VX_CREATE_DEFAULT(mb_UniformMandelbrotInfoBlock,
         .a = 1.0f,
     },
     .resolution_rateo = (f32)WINDOW_WIDTH / (f32)WINDOW_HEIGHT,
-    .maxValue = 2.0f
+    .max_value = 2.0f
 )
 
 /**
  * This struct contains the data that is uploaded to the GPU in
  * order to apply the prospective or orthogonal view.
  */
-typedef struct mb_UniformTransformBlock {
+typedef struct mb_Uniformtransfrom_block {
     hmm_mat4 projection;
     hmm_mat4 view;
     hmm_mat4 model;
-} mb_UniformTransformBlock;
-VX_CREATE_DEFAULT(mb_UniformTransformBlock,
+} mb_Uniformtransfrom_block;
+VX_CREATE_DEFAULT(mb_Uniformtransfrom_block,
     .projection = { 0 },
     .model = { 0 },
     .view = { 0 }
@@ -75,12 +75,12 @@ VX_CREATE_DEFAULT(mb_UniformTransformBlock,
  * This struct contains various stuff used to draw the set.
  */
 typedef struct mb_GfxData {
-    sg_buffer vertexBuffer;
-    sg_buffer indexBuffer;
+    sg_buffer vertex_buffer;
+    sg_buffer index_buffer;
     sg_shader shader;
     sg_pipeline pipelines;
     sg_bindings bindings;
-    sg_pass_action passAction;
+    sg_pass_action pass_action;
 
     u32 screenWidth;
     u32 screenHeight;
@@ -99,9 +99,9 @@ VX_CREATE_DEFAULT(mb_GfxData,
  * Global data. Always available in every state.
  */
 typedef struct mb_GlobalData {
-    mb_UniformMandelbrotInfoBlock mandelbrotInfoBlock;
-    mb_UniformTransformBlock transformBlock;
-    mb_GfxData gfxData;
+    mb_Uniformmandelbrot_info_block mandelbrot_info_block;
+    mb_Uniformtransfrom_block transfrom_block;
+    mb_GfxData gfx_data;
 
     bool gui_enabled;
     bool disco_mode;
@@ -114,9 +114,9 @@ typedef struct mb_GlobalData {
     f32 disco_speed;
 } mb_GlobalData;
 VX_CREATE_DEFAULT(mb_GlobalData,
-    .transformBlock = VX_DEFAULT(mb_UniformTransformBlock),
-    .mandelbrotInfoBlock = VX_DEFAULT(mb_UniformMandelbrotInfoBlock),
-    .gfxData = VX_DEFAULT(mb_GfxData),
+    .transfrom_block = VX_DEFAULT(mb_Uniformtransfrom_block),
+    .mandelbrot_info_block = VX_DEFAULT(mb_Uniformmandelbrot_info_block),
+    .gfx_data = VX_DEFAULT(mb_GfxData),
     .gui_enabled = true,
     .disco_mode = false,
     .disco_speed = 1.0f,

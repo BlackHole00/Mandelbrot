@@ -45,7 +45,7 @@ void mb_global_init(mb_GlobalData* global_data) {
          1.0f,  1.0f, -1.0f,     -1.0f,  1.0f
     };
     /* Upload the buffer to the GPU. */
-    global_data->gfxData.vertexBuffer = sg_make_buffer(&(sg_buffer_desc){
+    global_data->gfx_data.vertex_buffer = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(vertices),
         .type = SG_BUFFERTYPE_VERTEXBUFFER,
         .usage = SG_USAGE_IMMUTABLE
@@ -60,7 +60,7 @@ void mb_global_init(mb_GlobalData* global_data) {
         16, 17, 18,  16, 18, 19,
         22, 21, 20,  23, 22, 20
     };
-    global_data->gfxData.indexBuffer = sg_make_buffer(&(sg_buffer_desc){
+    global_data->gfx_data.index_buffer = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(indices),
         .type = SG_BUFFERTYPE_INDEXBUFFER,
         .usage = SG_USAGE_IMMUTABLE
@@ -73,11 +73,11 @@ void mb_global_init(mb_GlobalData* global_data) {
     VX_ASSERT("fs_source is NULL. Does the source file exists?", fs_source != NULL);
 
     /* Tell the GPU how to use the sources and how to read the GPU shared data (uniforms, not buffers). */
-    global_data->gfxData.shader = sg_make_shader(&(sg_shader_desc){
+    global_data->gfx_data.shader = sg_make_shader(&(sg_shader_desc){
         .vs = {
             .source = vs_source,
             .uniform_blocks[0] = {
-                .size = sizeof(mb_UniformTransformBlock),
+                .size = sizeof(mb_Uniformtransfrom_block),
                 .uniforms = {
                     [0] = {
                         .name = "projection",
@@ -97,10 +97,10 @@ void mb_global_init(mb_GlobalData* global_data) {
         .fs = {
             .source = fs_source,
             .uniform_blocks[0] = {
-                .size = sizeof(mb_UniformMandelbrotInfoBlock),
+                .size = sizeof(mb_Uniformmandelbrot_info_block),
                 .uniforms = {
                     [0] = {
-                        .name = "maxIterations",
+                        .name = "max_iterations",
                         .type = SG_UNIFORMTYPE_FLOAT,
                     },
                     [1] = {
@@ -120,7 +120,7 @@ void mb_global_init(mb_GlobalData* global_data) {
                         .type = SG_UNIFORMTYPE_FLOAT,
                     },
                     [5] = {
-                        .name = "maxValue",
+                        .name = "max_value",
                         .type = SG_UNIFORMTYPE_FLOAT,
                     }
                 }
@@ -132,8 +132,8 @@ void mb_global_init(mb_GlobalData* global_data) {
     free(fs_source);
 
     /* a pipeline state object. Tell the GPU how to draw and how to interpret the buffers data. */
-    global_data->gfxData.pipelines = sg_make_pipeline(&(sg_pipeline_desc){
-        .shader = global_data->gfxData.shader,
+    global_data->gfx_data.pipelines = sg_make_pipeline(&(sg_pipeline_desc){
+        .shader = global_data->gfx_data.shader,
         .index_type = SG_INDEXTYPE_UINT16,
         .layout = {
             .attrs = {
@@ -149,53 +149,53 @@ void mb_global_init(mb_GlobalData* global_data) {
     });
 
     /* resource bindings */
-    global_data->gfxData.bindings = (sg_bindings){
-        .vertex_buffers[0] = global_data->gfxData.vertexBuffer,
-        .index_buffer = global_data->gfxData.indexBuffer
+    global_data->gfx_data.bindings = (sg_bindings){
+        .vertex_buffers[0] = global_data->gfx_data.vertex_buffer,
+        .index_buffer = global_data->gfx_data.index_buffer
     };
 
     /* default pass action */
-    global_data->gfxData.passAction = (sg_pass_action){ 0 };
+    global_data->gfx_data.pass_action = (sg_pass_action){ 0 };
 
-    global_data->transformBlock.model = HMM_Mat4d(1.0f);
+    global_data->transfrom_block.model = HMM_Mat4d(1.0f);
 }
 
 void mb_global_close(mb_GlobalData* global_data) {
     /* Free the resources used. */
-    sg_destroy_buffer(global_data->gfxData.vertexBuffer);
-    sg_destroy_buffer(global_data->gfxData.indexBuffer);
-    sg_destroy_pipeline(global_data->gfxData.pipelines);
-    sg_destroy_shader(global_data->gfxData.shader);
+    sg_destroy_buffer(global_data->gfx_data.vertex_buffer);
+    sg_destroy_buffer(global_data->gfx_data.index_buffer);
+    sg_destroy_pipeline(global_data->gfx_data.pipelines);
+    sg_destroy_shader(global_data->gfx_data.shader);
 }
 
-void mb_shared_disco_update_colors(mb_GlobalData* general_data) {
-    general_data->mandelbrotInfoBlock.color.r += 1.0f/255.0f * general_data->disco_speed * (general_data->color_modes.r ? -1.0 : 1.0);
-    general_data->mandelbrotInfoBlock.color.g += 1.0f/255.0f * general_data->disco_speed * 1.5 * (general_data->color_modes.g ? -1.0 : 1.0);
-    general_data->mandelbrotInfoBlock.color.b += 1.0f/255.0f * general_data->disco_speed * 1.5 * 1.75 * (general_data->color_modes.b ? -1.0 : 1.0);
+void mb_shared_disco_update_colors(mb_GlobalData* global_data) {
+    global_data->mandelbrot_info_block.color.r += 1.0f/255.0f * global_data->disco_speed * (global_data->color_modes.r ? -1.0 : 1.0);
+    global_data->mandelbrot_info_block.color.g += 1.0f/255.0f * global_data->disco_speed * 1.5 * (global_data->color_modes.g ? -1.0 : 1.0);
+    global_data->mandelbrot_info_block.color.b += 1.0f/255.0f * global_data->disco_speed * 1.5 * 1.75 * (global_data->color_modes.b ? -1.0 : 1.0);
 
     /* Not going to 1.0 or 0.0 because bloom. */
-    if (general_data->mandelbrotInfoBlock.color.r > 0.95f) {
-        general_data->color_modes.r = true;
-        general_data->mandelbrotInfoBlock.color.r = 0.95f;
+    if (global_data->mandelbrot_info_block.color.r > 0.95f) {
+        global_data->color_modes.r = true;
+        global_data->mandelbrot_info_block.color.r = 0.95f;
     }
-    if (general_data->mandelbrotInfoBlock.color.g > 0.95f) {
-        general_data->color_modes.g = true;
-        general_data->mandelbrotInfoBlock.color.g = 0.95f;
+    if (global_data->mandelbrot_info_block.color.g > 0.95f) {
+        global_data->color_modes.g = true;
+        global_data->mandelbrot_info_block.color.g = 0.95f;
     }
-    if (general_data->mandelbrotInfoBlock.color.b > 0.95f) {
-        general_data->color_modes.b = true;
-        general_data->mandelbrotInfoBlock.color.b = 0.95f;
+    if (global_data->mandelbrot_info_block.color.b > 0.95f) {
+        global_data->color_modes.b = true;
+        global_data->mandelbrot_info_block.color.b = 0.95f;
     }
-    if (general_data->mandelbrotInfoBlock.color.r < 0.075f) {
-        general_data->color_modes.r = false;
-        general_data->mandelbrotInfoBlock.color.r = 0.05f;
+    if (global_data->mandelbrot_info_block.color.r < 0.075f) {
+        global_data->color_modes.r = false;
+        global_data->mandelbrot_info_block.color.r = 0.05f;
     }
-    if (general_data->mandelbrotInfoBlock.color.g < 0.05f) {
-        general_data->color_modes.g = false;
-        general_data->mandelbrotInfoBlock.color.g = 0.05f;
+    if (global_data->mandelbrot_info_block.color.g < 0.05f) {
+        global_data->color_modes.g = false;
+        global_data->mandelbrot_info_block.color.g = 0.05f;
     }
-    if (general_data->mandelbrotInfoBlock.color.b < 0.05f) {
-        general_data->color_modes.b = false;
-        general_data->mandelbrotInfoBlock.color.b = 0.05f;
+    if (global_data->mandelbrot_info_block.color.b < 0.05f) {
+        global_data->color_modes.b = false;
+        global_data->mandelbrot_info_block.color.b = 0.05f;
     }
 }

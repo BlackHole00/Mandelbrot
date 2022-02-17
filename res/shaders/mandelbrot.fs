@@ -5,14 +5,14 @@ precision highp float;
 out vec4 frag_color;
 in vec2 coord;
 
-uniform float maxIterations;
+uniform float max_iterations;
 uniform vec2 position;
 uniform vec2 scale;
 uniform vec4 color;
 uniform float resolution_rateo;
-uniform float maxValue;
+uniform float max_value;
 
-vec2 squareImaginary(vec2 number){
+vec2 square_imaginary(vec2 number){
     vec2 vec;
     vec.x = number.x * number.x - number.y * number.y;
     vec.y = 2 * number.x * number.y;
@@ -20,34 +20,34 @@ vec2 squareImaginary(vec2 number){
 	return vec;
 }
 
-float pseudoLenght(vec2 vec) {
+float pseudo_lenght(vec2 vec) {
     return sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
-float iterateMandelbrot(vec2 localCoord){
+float iterate_mandelbrot(vec2 local_coord){
 //  ORIGINAL ALGORITHM
 	vec2 z;
-    z.x = localCoord.x;
-    z.y = localCoord.y;
+    z.x = local_coord.x;
+    z.y = local_coord.y;
 
-	for (int i = 1; i < maxIterations; i++) {
-		vec2 tmp = squareImaginary(z);
-        z.x = tmp.x + localCoord.x;
-        z.y = tmp.y + localCoord.y;
+	for (int i = 1; i < max_iterations; i++) {
+		vec2 tmp = square_imaginary(z);
+        z.x = tmp.x + local_coord.x;
+        z.y = tmp.y + local_coord.y;
 
-		if (pseudoLenght(z) > maxValue) {
-            return i / maxIterations;
+		if (pseudo_lenght(z) > max_value) {
+            return i / max_iterations;
         }
 	}
 	return 1.0;
 }
 
 void main() {
-    vec2 startCoord;
-    startCoord.x = (coord.x / scale.x + position.x) * resolution_rateo;
-    startCoord.y = (coord.y / scale.y + position.y);
+    vec2 start_coord;
+    start_coord.x = (coord.x / scale.x + position.x) * resolution_rateo;
+    start_coord.y = (coord.y / scale.y + position.y);
 
-    float res = iterateMandelbrot(startCoord);
+    float res = iterate_mandelbrot(start_coord);
 
     frag_color = vec4(res * color.r, res * color.g, res * color.b, 1.0f);
 }

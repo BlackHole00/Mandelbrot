@@ -43,15 +43,15 @@ void mb_camera_controls_3dmode(mb_Mode3DData* state, vx_WindowInputHelper* input
     }
 }
 
-void mb_input_mode2d(mb_GlobalData* general_data, vx_WindowInputHelper* input) {
+void mb_input_mode2d(mb_GlobalData* global_data, vx_WindowInputHelper* input) {
     if (input->mouse.scrolled) {
-        general_data->mandelbrotInfoBlock.xScale += (f32)input->mouse.scroll_offset_y * general_data->mandelbrotInfoBlock.xScale / 10.0f;
-        general_data->mandelbrotInfoBlock.yScale += (f32)input->mouse.scroll_offset_y * general_data->mandelbrotInfoBlock.yScale / 10.0f;
+        global_data->mandelbrot_info_block.x_scale += (f32)input->mouse.scroll_offset_y * global_data->mandelbrot_info_block.x_scale / 10.0f;
+        global_data->mandelbrot_info_block.y_scale += (f32)input->mouse.scroll_offset_y * global_data->mandelbrot_info_block.y_scale / 10.0f;
     }
 
     if (input->mouse.mouse_buttons[GLFW_MOUSE_BUTTON_LEFT].pressed) {
-        general_data->mandelbrotInfoBlock.xPosition += (f32)input->mouse.offset_x / (f32)general_data->gfxData.screenWidth   / general_data->mandelbrotInfoBlock.xScale;
-        general_data->mandelbrotInfoBlock.yPosition += (f32)input->mouse.offset_y / -(f32)general_data->gfxData.screenHeight / general_data->mandelbrotInfoBlock.yScale;
+        global_data->mandelbrot_info_block.x_position += (f32)input->mouse.offset_x / (f32)global_data->gfx_data.screenWidth   / global_data->mandelbrot_info_block.x_scale;
+        global_data->mandelbrot_info_block.y_position += (f32)input->mouse.offset_y / -(f32)global_data->gfx_data.screenHeight / global_data->mandelbrot_info_block.y_scale;
     }
 }
 

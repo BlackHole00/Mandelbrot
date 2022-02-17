@@ -19,7 +19,7 @@ void mb_camera_controls_3dmode(mb_Mode3DData* state, vx_WindowInputHelper* input
 /**
  * This functions handles the input in the 2d state.
  */
-void mb_input_mode2d(mb_GlobalData* general_data, vx_WindowInputHelper* input);
+void mb_input_mode2d(mb_GlobalData* global_data, vx_WindowInputHelper* input);
 
 /**
  * This functions handles the input in the 3d state.
