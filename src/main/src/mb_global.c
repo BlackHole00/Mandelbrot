@@ -116,8 +116,8 @@ void mb_global_init(mb_GlobalData* global_data) {
                         .type = SG_UNIFORMTYPE_FLOAT4,
                     },
                     [4] = {
-                        .name = "resolution",
-                        .type = SG_UNIFORMTYPE_FLOAT2,
+                        .name = "resolution_rateo",
+                        .type = SG_UNIFORMTYPE_FLOAT,
                     },
                     [5] = {
                         .name = "maxValue",

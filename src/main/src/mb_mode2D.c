@@ -55,8 +55,6 @@ vx_StateUID mb_mode2d_logic(mb_GlobalData* general_data, mb_Mode2DData* state, v
 void mb_mode2d_draw(mb_GlobalData* general_data, mb_Mode2DData* state) {
     general_data->gfxData.passAction.colors[0].action = SG_ACTION_CLEAR;
     general_data->gfxData.passAction.colors[0].value = *((sg_color*)&general_data->gfxData.mode3d.bgColor);
-    general_data->mandelbrotInfoBlock.resolution.screenWidth =  (float)general_data->gfxData.screenWidth * general_data->gfxData.resolutionMultiplier;
-    general_data->mandelbrotInfoBlock.resolution.screenHeight = (float)general_data->gfxData.screenHeight * general_data->gfxData.resolutionMultiplier;
 
     vx_camera_apply(&state->camera, &general_data->transformBlock.projection, &general_data->transformBlock.view, true);
 
@@ -84,6 +82,7 @@ void mb_mode2d_draw(mb_GlobalData* general_data, mb_Mode2DData* state) {
 void mb_mode2d_resize(mb_GlobalData* general_data, mb_Mode2DData* state, vx_WindowControl* window, u32 width, u32 height) {
     general_data->gfxData.screenWidth = width;
     general_data->gfxData.screenHeight = height;
+    general_data->mandelbrotInfoBlock.resolution_rateo = (f32)width / (f32)height;
     vx_camera_set_viewport_size(&state->camera, width, height);
 }
 

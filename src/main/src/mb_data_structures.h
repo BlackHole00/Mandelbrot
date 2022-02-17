@@ -37,10 +37,7 @@ typedef struct mb_UniformMandelbrotInfoBlock {
     float xScale;
     float yScale;
     struct nk_colorf color;
-    struct {
-        f32 screenWidth;
-        f32 screenHeight;
-    } resolution;
+    float resolution_rateo;
     float maxValue;
 } mb_UniformMandelbrotInfoBlock;
 VX_CREATE_DEFAULT(mb_UniformMandelbrotInfoBlock, 
@@ -55,6 +52,7 @@ VX_CREATE_DEFAULT(mb_UniformMandelbrotInfoBlock,
         .b = 1.0f,
         .a = 1.0f,
     },
+    .resolution_rateo = (f32)WINDOW_WIDTH / (f32)WINDOW_HEIGHT,
     .maxValue = 2.0f
 )
 
@@ -77,8 +75,6 @@ VX_CREATE_DEFAULT(mb_UniformTransformBlock,
  * This struct contains various stuff used to draw the set.
  */
 typedef struct mb_GfxData {
-    float resolutionMultiplier;
-
     sg_buffer vertexBuffer;
     sg_buffer indexBuffer;
     sg_shader shader;
@@ -97,7 +93,6 @@ VX_CREATE_DEFAULT(mb_GfxData,
     .screenWidth = WINDOW_WIDTH,
     .screenHeight = WINDOW_HEIGHT,
     .mode3d.bgColor = { 0.75f, 0.75f, 0.75f },
-    .resolutionMultiplier = 1.0f,
 )
 
 /**
